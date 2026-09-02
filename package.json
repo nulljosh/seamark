@@ -1,12 +1,12 @@
 {
-  "name": "sextant",
+  "name": "seamark",
   "version": "0.1.0",
-  "description": "Read state out of live browser graphics",
+  "description": "Read the numbers out of graphics a page only shows as pictures",
   "type": "module",
   "main": "src/index.js",
   "scripts": {
     "test": "node --test test/*.test.mjs",
-    "build": "cat src/coords.js src/curve.js src/expr.js src/dom.js > public/sextant.js"
+    "build": "cat src/coords.js src/curve.js src/expr.js src/dom.js > public/seamark.js"
   },
   "license": "MIT"
 }

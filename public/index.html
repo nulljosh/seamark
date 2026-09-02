@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sextant — read real values out of rendered graphics</title>
+<title>Seamark — read real values out of rendered graphics</title>
 <meta name="description" content="A small JavaScript library that recovers the numbers behind charts, diagrams and widgets that only exist as drawn output.">
 <meta name="theme-color" content="#c2451f">
-<meta property="og:title" content="Sextant — read real values out of rendered graphics">
+<meta property="og:title" content="Seamark — read real values out of rendered graphics">
 <meta property="og:description" content="A small JavaScript library that recovers the numbers behind charts, diagrams and widgets that only exist as drawn output.">
 <meta property="og:type" content="website">
 <style>
@@ -49,7 +49,26 @@ a:hover { text-decoration: underline; }
 .container { max-width: 760px; margin: 0 auto; padding: 0 1.5rem; }
 .container.wide { max-width: 1080px; }
 
-.hero { background: var(--accent-soft); padding: 5.5rem 0 4.5rem; text-align: center; }
+.hero { position: relative; isolation: isolate; overflow: hidden; background: var(--accent-soft); padding: 5.5rem 0 4.5rem; text-align: center; }
+.hero .container { position: relative; z-index: 2; }
+/* a slow-drifting wall of little curve readings, the demo as wallpaper */
+.hero-wall { position: absolute; inset: -8%; z-index: 0; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 10px; opacity: 0.5; pointer-events: none; user-select: none; }
+.wall-col { display: flex; min-width: 0; flex-direction: column; gap: 10px; }
+.wall-col svg { display: block; width: 100%; height: auto; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; }
+.wall-col.up   { animation: wall-up   var(--dur) linear infinite; }
+.wall-col.down { animation: wall-down var(--dur) linear infinite; }
+@keyframes wall-up   { from { transform: translateY(0); }    to { transform: translateY(-50%); } }
+@keyframes wall-down { from { transform: translateY(-50%); } to { transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .wall-col { animation: none; } }
+.hero::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: radial-gradient(ellipse 55% 60% at 50% 45%, var(--accent-soft) 20%, transparent 80%),
+    linear-gradient(var(--accent-soft), transparent 30%, transparent 62%, var(--accent-soft) 96%),
+    color-mix(in srgb, var(--accent-soft) 50%, transparent); }
+.xp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; }
+.xp-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 1.4rem; }
+.xp-card h3 { font-size: 1rem; font-weight: 650; margin-bottom: 0.4rem; }
+.xp-card p { font-size: 0.93rem; color: var(--text2); margin-bottom: 0.6rem; }
+.xp-lead { color: var(--text2); max-width: 40rem; margin: -1.25rem auto 2rem; text-align: center; }
 .hero h1 { font-size: clamp(2.25rem, 6.5vw, 3.5rem); font-weight: 700; letter-spacing: -0.025em; line-height: 1.08; margin-bottom: 0.85rem; }
 .hero p { font-size: clamp(1.05rem, 2.4vw, 1.25rem); color: var(--text2); max-width: 34rem; margin: 0 auto 2.25rem; }
 
@@ -65,7 +84,7 @@ a:hover { text-decoration: underline; }
 .btn-outline:hover { border-color: var(--link, var(--accent)); color: var(--link, var(--accent)); }
 
 section { padding: 4rem 0; }
-section h2 { font-size: clamp(1.5rem, 3.6vw, 2rem); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 2.25rem; text-align: center; }
+section h2 { font-size: clamp(1.75rem, 4.2vw, 2.5rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 2.25rem; text-align: center; }
 .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; }
 .feature { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 1.4rem; }
 .feature h3 { font-size: 1rem; font-weight: 650; margin-bottom: 0.4rem; }
@@ -107,35 +126,36 @@ a.skip:focus { position: fixed; left: 1rem; top: 1rem; z-index: 99; padding: 0.5
 <main id="main">
 
 <section class="hero">
+  <div class="hero-wall" id="heroWall" aria-hidden="true"></div>
   <div class="container">
-    <h1>Sextant</h1>
-    <p>A sextant fixes your position by observing what is visible, without instrumenting anything it measures. This library does the same for a web page: it reads real values out of rendered graphics.</p>
+    <h1>Seamark</h1>
+    <p data-i18n="tag">A seamark is a fixed thing you can see from the water and steer by. This library does the same for a web page: it reads real values out of rendered graphics.</p>
     <div class="buttons">
-      <a class="btn btn-primary" href="#demo">Try the demo</a>
-      <a class="btn btn-outline" href="https://github.com/nulljosh/sextant">Source on GitHub</a>
+      <a class="btn btn-primary" href="#demo" data-i18n="try">Try the demo</a>
+      <a class="btn btn-outline" href="https://github.com/nulljosh/seamark" data-i18n="source">Source on GitHub</a>
     </div>
   </div>
 </section>
 
 <section class="features">
   <div class="container">
-    <h2>What it reads</h2>
+    <h2 data-i18n="h_reads">It reads the picture. You get the numbers.</h2>
     <div class="grid">
       <div class="feature">
-        <h3>Coordinates</h3>
-        <p>SVG user units, CSS pixels, an iframe's viewport and screenshot space, with every conversion explicit. Mixing two gives plausible numbers, never an error.</p>
+        <h3 data-i18n="f1t">Coordinates</h3>
+        <p data-i18n="f1">SVG user units, CSS pixels, an iframe's viewport and screenshot space, with every conversion explicit. Mixing two gives plausible numbers, never an error.</p>
       </div>
       <div class="feature">
-        <h3>Curves</h3>
-        <p>Sample a drawn path into data space, find where it crosses a level, fit a circle from a partial arc, and tell linear from quadratic from exponential.</p>
+        <h3 data-i18n="f2t">Curves</h3>
+        <p data-i18n="f2">Sample a drawn path into data space, find where it crosses a level, fit a circle from a partial arc, and tell linear from quadratic from exponential.</p>
       </div>
       <div class="feature">
-        <h3>Expressions</h3>
-        <p>Compare rendered maths by fingerprint over several sample points. <code>x(x+8)</code> and <code>x²+8x</code> share no characters and agree at exactly the point you would test first.</p>
+        <h3 data-i18n="f3t">Expressions</h3>
+        <p data-i18n="f3">Compare rendered maths by fingerprint over several sample points. <code>x(x+8)</code> and <code>x²+8x</code> share no characters and agree at exactly the point you would test first.</p>
       </div>
       <div class="feature">
-        <h3>Widgets</h3>
-        <p>Pick the iframe that is actually visible, pin labels to the edges and points they annotate, plan the drags a dot plot needs, and click in a way frameworks accept.</p>
+        <h3 data-i18n="f4t">Widgets</h3>
+        <p data-i18n="f4">Pick the iframe that is actually visible, pin labels to the edges and points they annotate, plan the drags a dot plot needs, and click in a way frameworks accept.</p>
       </div>
     </div>
   </div>
@@ -143,48 +163,63 @@ a.skip:focus { position: fixed; left: 1rem; top: 1rem; z-index: 99; padding: 0.5
 
 <section id="demo">
   <div class="container wide">
-    <h2>Draw something. It only measures what is on screen.</h2>
+    <h2 data-i18n="h_draw">Draw something. It only measures what's on screen.</h2>
     <div class="bar">
-      <button id="clear">Clear</button>
-      <button data-ex="parabola">Parabola</button>
-      <button data-ex="exp">Exponential</button>
-      <button data-ex="sine">Sine</button>
-      <button data-ex="hyperbola">Hyperbola</button>
-      <button data-ex="step">Step</button>
-      <button data-ex="arc">Arc</button>
-      <button data-ex="circle">Full circle</button>
-      <button data-ex="piecewise">Piecewise pair</button>
+      <button id="clear" data-i18n="clear">Clear</button>
+      <button data-ex="parabola" data-i18n="parabola">Parabola</button>
+      <button data-ex="exp" data-i18n="exp">Exponential</button>
+      <button data-ex="sine" data-i18n="sine">Sine</button>
+      <button data-ex="hyperbola" data-i18n="hyperbola">Hyperbola</button>
+      <button data-ex="step" data-i18n="step">Step</button>
+      <button data-ex="arc" data-i18n="arc">Arc</button>
+      <button data-ex="circle" data-i18n="circle">Full circle</button>
+      <button data-ex="piecewise" data-i18n="piecewise">Piecewise pair</button>
     </div>
     <div class="demo">
       <div class="panel stage">
         <svg id="board" viewBox="0 0 640 440" aria-label="Drawing area with a coordinate grid"></svg>
       </div>
       <div class="panel read">
-        <h3>Measured from the drawing</h3>
-        <div class="row"><span>Samples</span><span id="m-n">—</span></div>
-        <div class="row"><span>x range</span><span id="m-x">—</span></div>
-        <div class="row"><span>y range</span><span id="m-y">—</span></div>
-        <div class="row"><span>Crosses y=0 at</span><span id="m-roots">—</span></div>
-        <div class="row"><span>Branch</span><span id="m-kind">—</span></div>
-        <div class="row"><span>Family</span><span id="m-family">—</span></div>
-        <div class="row"><span>Circle fit</span><span id="m-circle">—</span></div>
-        <p class="hint">Every number is derived from the rendered path: sampled, mapped out of SVG user units, and reported in grid coordinates. The demo never hands over the points it drew with.</p>
+        <h3 data-i18n="measured">Measured from the drawing</h3>
+        <div class="row"><span data-i18n="samples">Samples</span><span id="m-n">—</span></div>
+        <div class="row"><span data-i18n="xrange">x range</span><span id="m-x">—</span></div>
+        <div class="row"><span data-i18n="yrange">y range</span><span id="m-y">—</span></div>
+        <div class="row"><span data-i18n="roots">Crosses y=0 at</span><span id="m-roots">—</span></div>
+        <div class="row"><span data-i18n="branch">Branch</span><span id="m-kind">—</span></div>
+        <div class="row"><span data-i18n="family">Family</span><span id="m-family">—</span></div>
+        <div class="row"><span data-i18n="circlefit">Circle fit</span><span id="m-circle">—</span></div>
+        <p class="hint" data-i18n="hint">Every number is derived from the rendered path: sampled, mapped out of SVG user units, and reported in grid coordinates. The demo never hands over the points it drew with.</p>
       </div>
+    </div>
+  </div>
+</section>
+
+<section id="apps">
+  <div class="container">
+    <h2 data-i18n="h_apps">Runs everywhere.</h2>
+    <p class="xp-lead" data-i18n="apps_lead">The same measurements, in six languages, on whatever you have in front of you.</p>
+    <div class="xp-grid">
+      <div class="xp-card"><h3 data-i18n="p_ios">iPhone &amp; iPad</h3><p data-i18n="p_ios_d">A native SwiftUI app. Draw with a finger, read the numbers.</p><a href="https://github.com/nulljosh/seamark/tree/main/ios" data-i18n="build">Build from source &rarr;</a></div>
+      <div class="xp-card"><h3 data-i18n="p_mac">Mac</h3><p data-i18n="p_mac_d">Same app, same engine, a real window and a trackpad.</p><a href="https://github.com/nulljosh/seamark/tree/main/ios" data-i18n="build">Build from source &rarr;</a></div>
+      <div class="xp-card"><h3 data-i18n="p_android">Android</h3><p data-i18n="p_android_d">Native Compose app. Same engine, ported to Kotlin.</p><a href="https://github.com/nulljosh/seamark/tree/main/kmp" data-i18n="build">Build from source &rarr;</a></div>
+      <div class="xp-card"><h3 data-i18n="p_desktop">Windows &amp; Linux</h3><p data-i18n="p_desktop_d">The Compose app packaged as an installer, MSI or DEB.</p><a href="https://github.com/nulljosh/seamark/tree/main/kmp" data-i18n="build">Build from source &rarr;</a></div>
+      <div class="xp-card"><h3 data-i18n="p_web">Web</h3><p data-i18n="p_web_d">Nothing to install. The demo above is the whole thing.</p><a href="#demo" data-i18n="tryit">Try it &rarr;</a></div>
+      <div class="xp-card"><h3 data-i18n="p_lib">In your code</h3><p data-i18n="p_lib_d">A small JavaScript library with no dependencies.</p><a href="https://github.com/nulljosh/seamark">npm install seamark &rarr;</a></div>
     </div>
   </div>
 </section>
 
 <section class="closing">
   <div class="container">
-    <h2>Why this is harder than it looks</h2>
-    <p>A picture on a web page is measured in four different rulers at once: the drawing's own units, the page's pixels, the little frame it sits in, and the screenshot you took of it. Mix up any two and you get a number that looks perfectly reasonable and is quietly wrong. Sextant keeps every ruler straight, reads the curve the way a person would, and checks that two formulas really are the same by testing them at several points, not just the one that always agrees.</p>
+    <h2 data-i18n="h_why">Harder than it looks.</h2>
+    <p data-i18n="why">A picture on a web page is measured in four different rulers at once: the drawing's own units, the page's pixels, the little frame it sits in, and the screenshot you took of it. Mix up any two and you get a number that looks perfectly reasonable and is quietly wrong. Seamark keeps every ruler straight, reads the curve the way a person would, and checks that two formulas really are the same by testing them at several points, not just the one that always agrees.</p>
   </div>
 </section>
 
 <section class="closing">
   <div class="container">
-    <h2>Use it</h2>
-<pre><code>import { samplePath, crossings, fitCircle, family, makeDataSpace } from 'sextant';
+    <h2 data-i18n="h_use">Use it.</h2>
+<pre><code>import { samplePath, crossings, fitCircle, family, makeDataSpace } from 'seamark';
 
 const space = makeDataSpace(originInPagePx, oneUnitInPagePx);
 const points = samplePath(document.querySelector('svg path'), space.toData);
@@ -198,13 +233,17 @@ family(points);      // 'linear' | 'quadratic' | 'exponential' | null</code></pr
 </main>
 <footer>
   <div class="container">
-    <p>Sextant &mdash; by <a href="https://heyitsmejosh.com">Joshua Trommel</a></p>
-    <p><a href="https://github.com/nulljosh/sextant">Source on GitHub</a> &middot; MIT</p>
+    <p>Seamark &mdash; <span data-i18n="by">by</span> <a href="https://heyitsmejosh.com">Joshua Trommel</a></p>
+    <p><a href="https://github.com/nulljosh/seamark">Source on GitHub</a> &middot; MIT</p>
   </div>
 </footer>
 
 <script type="module">
-import { samplePath, crossings, describe, fitCircle, family } from './sextant.js';
+import { samplePath, crossings, describe, fitCircle, family } from './seamark.js';
+import { I18N, pick } from './i18n.js';
+const T = I18N[pick()];
+document.documentElement.lang = pick();
+for (const el of document.querySelectorAll('[data-i18n]')) if (T[el.dataset.i18n]) el.textContent = T[el.dataset.i18n];
 
 const svg = document.getElementById('board');
 const NS = 'http://www.w3.org/2000/svg';
@@ -275,14 +314,14 @@ function report(data) {
   set('m-x', fmt(d.x0) + ' … ' + fmt(d.x1));
   set('m-y', fmt(d.y0) + ' … ' + fmt(d.y1));
   const r = crossings(data);
-  set('m-roots', r.length ? r.map(fmt).join(', ') : 'never');
-  set('m-kind', d.flat ? 'horizontal' : d.vertical ? 'vertical' : 'slanted / curved');
-  set('m-family', family(data) || 'none of the three');
+  set('m-roots', r.length ? r.map(fmt).join(', ') : T.never);
+  set('m-kind', d.flat ? T.horizontal : d.vertical ? T.vertical : T.curved);
+  const fam = family(data); set('m-family', fam ? T[fam] : T.none);
   const c = fitCircle(data);
   const err = c ? data.reduce((s, [x, y]) =>
     s + Math.abs(Math.hypot(x - c.cx, y - c.cy) - c.r), 0) / data.length : 9;
   set('m-circle', c && err < 0.12
-    ? 'centre (' + fmt(c.cx) + ', ' + fmt(c.cy) + ')  r=' + fmt(c.r) : 'not a circle');
+    ? T.centre + ' (' + fmt(c.cx) + ', ' + fmt(c.cy) + ')  r=' + fmt(c.r) : T.notcircle);
 }
 
 function drawFn(f, x0, x1, step = 0.05) {
@@ -311,6 +350,32 @@ document.getElementById('clear').onclick = reset;
 for (const b of document.querySelectorAll('[data-ex]')) b.onclick = examples[b.dataset.ex];
 
 reset();
+
+// hero wallpaper: columns of tiny curve tiles, each with its measured roots marked
+(function wall() {
+  const host = document.getElementById('heroWall');
+  const fns = [
+    (x) => 0.5 * (x * x - 4), (x) => 2 * Math.sin(x), (x) => 0.5 * 2 ** x, (x) => 3 / x,
+    (x) => Math.floor(x), (x) => -0.5 * x + 1, (x) => 0.3 * x ** 3 - 2 * x, (x) => Math.abs(x) - 2,
+    (x) => 2 * Math.cos(1.5 * x), (x) => x * x * x / 8 - x, (x) => 1.5 * Math.tanh(x) * 2, (x) => -0.4 * (x - 1) * (x + 3),
+  ];
+  const tile = (f) => {
+    const pts = [];
+    for (let x = -4; x <= 4; x += 0.1) { const y = f(x); if (isFinite(y) && Math.abs(y) < 3.5) pts.push([x, y]); }
+    const d = pts.map(([x, y], i) => (i ? 'L' : 'M') + (60 + x * 12).toFixed(1) + ' ' + (40 - y * 10).toFixed(1)).join(' ');
+    const roots = crossings(pts).map((r) => `<circle cx="${(60 + r * 12).toFixed(1)}" cy="40" r="2.5" fill="var(--bg)" stroke="var(--text)"/>`).join('');
+    return `<svg viewBox="0 0 120 80"><path d="M0 40H120M60 0V80" stroke="var(--border)"/><path d="${d}" fill="none" stroke="var(--accent)" stroke-width="2"/>${roots}</svg>`;
+  };
+  const cols = Math.max(4, Math.min(8, Math.round(innerWidth / 180)));
+  for (let c = 0; c < cols; c++) {
+    const col = document.createElement('div');
+    col.className = 'wall-col ' + (c % 2 ? 'down' : 'up');
+    col.style.setProperty('--dur', (70 + c * 9) + 's');
+    const items = []; for (let i = 0; i < 6; i++) items.push(tile(fns[(c * 5 + i) % fns.length]));
+    col.innerHTML = items.join('') + items.join(''); // doubled so the loop is seamless
+    host.appendChild(col);
+  }
+})();
 </script>
 </body>
 </html>

@@ -1,64 +1,62 @@
-# sextant
+# Seamark
 
-Read real values out of rendered browser graphics.
+Read the numbers out of a chart or diagram a web page only shows as a picture.
 
-A sextant fixes your position by observing what is visible, without
-instrumenting anything it measures. This library does the same for a web page:
-given a chart, a diagram or a widget that only exists as drawn output, it
-recovers the numbers behind it.
+A seamark is a fixed thing you can see from the water and steer by. This
+library works the same way: it looks at what a page draws, not what it
+stores, and tells you the values behind it. Useful when the data never
+appears as text: SVG charts, third-party embeds, visual checks, and browser
+agents that have to act on what a page shows.
 
-Useful when the data is not in the DOM as text — canvas-adjacent SVG apps,
-third-party embeds, visual regression checks, and browser agents that have to
-act on what a page *shows* rather than what it exposes.
+## What it does
 
-## What's in it
-
-**Coordinates.** A browser graphic lives in four spaces at once: SVG user
-units, CSS pixels, an iframe's own viewport, and screenshot space. Mixing any
-two yields plausible numbers rather than an error, so a reading stays quietly
-wrong until something downstream breaks. Every conversion here is explicit.
-
-**Curves.** Sample a path into data space, find where it crosses a level,
-classify a branch as flat, vertical or slanted, least-squares fit a circle
-that works from a partial arc, and tell linear from quadratic from
-exponential — for a value table or a sampled curve, by fitting each model
-rather than taking finite differences, which break the moment x is uneven.
-
-**Expressions.** Compare rendered maths by fingerprint over several sample
-points, not by string and not by a single evaluation — `x(x+8)` and `x²+8x`
-share no characters and agree at exactly the point you would test first.
-
-**DOM.** Pick the iframe that is actually visible when stale ones are still
-mounted, match text labels to the edges they annotate, assign labels to points
-by total distance (greedy nearest-first steals the wrong point when labels sit
-consistently to one side), plan the drags that turn a dot plot's current
-columns into the required ones, and dispatch a pointer sequence that frameworks
-accept (`el.click()` alone is ignored by React handlers bound to pointer
-events, silently). Some widgets ignore synthetic events entirely; the drag
-planner and `centroid` give the caller the real-mouse coordinates.
+- **Keeps coordinates straight.** A browser graphic is measured in four rulers
+  at once: SVG units, page pixels, the frame it sits in, and your screenshot.
+  Mix two and you get a plausible wrong number. Every conversion here is explicit.
+- **Reads curves.** Sample a drawn path, find where it crosses a level, fit a
+  circle from a partial arc, and tell linear from quadratic from exponential.
+- **Compares formulas.** `x(x+8)` and `x²+8x` look nothing alike and agree at
+  exactly the point you would test first, so it compares them at several.
+- **Handles widgets.** Picks the iframe you can actually see, pins labels to
+  the shapes they sit on, plans the drags a dot plot needs, and clicks in a
+  way frameworks accept.
 
 ## Use
 
 ```js
-import { samplePath, crossings, fitCircle, family, makeDataSpace } from 'sextant';
+import { samplePath, crossings, fitCircle, family, makeDataSpace } from 'seamark';
 
 const space = makeDataSpace(originInPagePx, oneUnitInPagePx);
 const points = samplePath(document.querySelector('svg path'), space.toData);
 
-crossings(points);      // x values where the curve meets y = 0
-fitCircle(points);       // { cx, cy, r }
-family(points);          // 'linear' | 'quadratic' | 'exponential' | null
+crossings(points);   // where the curve meets y = 0
+fitCircle(points);   // { cx, cy, r }
+family(points);      // 'linear' | 'quadratic' | 'exponential' | null
 ```
 
 ```sh
-npm test          # 16 tests, node --test
-npm run build     # concatenates src/ into public/sextant.js for the demo
+npm test         # 16 tests
+npm run build    # bundles src/ into public/seamark.js for the demo
 ```
 
-## Demo
+## Apps
 
-Live at https://sextant.heyitsmejosh.com — draw a curve and watch the
-measurements come back. It reads the rendered path, never the point list it
-drew with.
+The same demo on every platform, in English, Spanish, French, German,
+Japanese and Chinese. Each app carries its own port of the engine with tests
+beside it, so nothing depends on a web view.
+
+- **Web:** https://seamark.heyitsmejosh.com. Draw a curve and watch it get measured.
+- **iPhone, iPad and Mac:** SwiftUI app in `ios/`. `Engine.swift` is the Swift port.
+- **Android, Windows and Linux:** Compose Multiplatform app in `kmp/`.
+  `Engine.kt` is the Kotlin port. Desktop packages as MSI, DEB or DMG.
+
+```sh
+cd ios && xcodegen generate                       # then open Seamark.xcodeproj
+swiftc -o /tmp/smcheck ios/App/Engine.swift ios/Checks/main.swift && /tmp/smcheck
+
+cd kmp && ./gradlew :shared:jvmTest               # Kotlin engine tests
+./gradlew :composeApp:assembleDebug               # Android APK
+./gradlew :composeApp:packageDistributionForCurrentOS
+```
 
 MIT.

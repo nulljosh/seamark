@@ -1,11 +1,11 @@
 # Roadmap
 
 ## Open
-- [ ] Name: "sextant" is a placeholder Joshua wants improved
+- [ ] Name: "seamark" is a placeholder Joshua wants improved
 - [ ] Publish to npm once the name is settled
 
 ## Done
-- 2026-09-01: custom domain sextant.heyitsmejosh.com attached via the Pages
+- 2026-09-01: custom domain seamark.heyitsmejosh.com attached via the Pages
   API using the wrangler OAuth token in `~/.wrangler/config/default.toml`
   (has `pages:write`; the DNS-scoped token does not)
 - 2026-09-01: ported the remaining Duolingo-solver techniques as generic

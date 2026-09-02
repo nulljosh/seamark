@@ -1,1 +1,6 @@
+.wrangler
+*.xcuserdata*
+ios/.asc/artifacts
+ios/build
+node_modules
 node_modules/
