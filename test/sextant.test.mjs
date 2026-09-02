@@ -1,9 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { makeDataSpace, pageToShot, snap } from '../src/coords.js';
-import { crossings, describe as describeBranch, fitCircle } from '../src/curve.js';
+import { crossings, describe as describeBranch, fitCircle, family, centroid } from '../src/curve.js';
 import { fromLatex, fingerprint, same, pairUp, degree } from '../src/expr.js';
-import { labelEdges } from '../src/dom.js';
+import { labelEdges, assign, rebalance } from '../src/dom.js';
 
 test('data space inverts a chart with a flipped y axis', () => {
   const s = makeDataSpace({ x: 100, y: 300 }, { x: 150, y: 250 });
@@ -83,4 +83,41 @@ test('labels attach to their nearest edge and know which is vertical', () => {
   assert.equal(got[0].vertical, false);
   assert.equal(got[1].vertical, true);
   assert.ok(got[0].distance < 6);
+});
+
+test('a value table is classified by the fewest-parameter model that fits', () => {
+  assert.equal(family([[0, 3], [1, 5], [2, 7], [3, 9]]), 'linear');
+  assert.equal(family([[0, 1], [1, 4], [2, 9], [3, 16]]), 'quadratic');
+  assert.equal(family([[0, 2], [1, 6], [2, 18], [3, 54]]), 'exponential');
+  assert.equal(family([[0, -2], [1, -6], [2, -18], [3, -54]]), 'exponential');
+  assert.equal(family([[0, 0], [1, 1], [2, 0], [3, 1]]), null);
+});
+
+test('family survives arc-length sampling, where x is uneven', () => {
+  const pts = [];
+  for (let t = 0; t <= 1; t += 0.01) { const x = -3 + 6 * t * t; pts.push([x, 0.5 * x * x - 2]); }
+  assert.equal(family(pts), 'quadratic');
+  const e = [];
+  for (let t = 0; t <= 1; t += 0.01) { const x = -4 + 7 * t * t; e.push([x, 0.5 * 2 ** x]); }
+  assert.equal(family(e), 'exponential');
+});
+
+test('centroid is the mean', () => {
+  assert.deepEqual(centroid([[0, 0], [2, 0], [2, 2], [0, 2]]), [1, 1]);
+});
+
+test('labels offset to the right pick the right points, where greedy would not', () => {
+  const points = [[0, 0], [1, 0], [2, 0]];
+  const labels = [{ x: 0.7, y: 0.1 }, { x: 1.7, y: 0.1 }, { x: 2.7, y: 0.1 }];
+  // greedy nearest-first gives label 0 -> point 1; the total-cost optimum is the shift
+  assert.deepEqual(assign(labels, points), [0, 1, 2]);
+});
+
+test('rebalance moves surplus dots into deficit columns', () => {
+  const dots = [{ x: 3 }, { x: 3 }, { x: 3 }, { x: 5 }];
+  const m = rebalance(dots, [3, 3, 5, 5]);
+  assert.equal(m.length, 1);
+  assert.equal(m[0].item.x, 3);
+  assert.equal(m[0].to, 5);
+  assert.equal(rebalance(dots, [3, 5, 5]), null);
 });

@@ -19,37 +19,46 @@ two yields plausible numbers rather than an error, so a reading stays quietly
 wrong until something downstream breaks. Every conversion here is explicit.
 
 **Curves.** Sample a path into data space, find where it crosses a level,
-classify a branch as flat, vertical or slanted, and least-squares fit a circle
-that works from a partial arc.
+classify a branch as flat, vertical or slanted, least-squares fit a circle
+that works from a partial arc, and tell linear from quadratic from
+exponential — for a value table or a sampled curve, by fitting each model
+rather than taking finite differences, which break the moment x is uneven.
 
 **Expressions.** Compare rendered maths by fingerprint over several sample
 points, not by string and not by a single evaluation — `x(x+8)` and `x²+8x`
 share no characters and agree at exactly the point you would test first.
 
 **DOM.** Pick the iframe that is actually visible when stale ones are still
-mounted, match text labels to the edges they annotate, and dispatch a pointer
-sequence that frameworks accept (`el.click()` alone is ignored by React
-handlers bound to pointer events, silently).
+mounted, match text labels to the edges they annotate, assign labels to points
+by total distance (greedy nearest-first steals the wrong point when labels sit
+consistently to one side), plan the drags that turn a dot plot's current
+columns into the required ones, and dispatch a pointer sequence that frameworks
+accept (`el.click()` alone is ignored by React handlers bound to pointer
+events, silently). Some widgets ignore synthetic events entirely; the drag
+planner and `centroid` give the caller the real-mouse coordinates.
 
 ## Use
 
 ```js
-import { samplePath, crossings, fitCircle, makeDataSpace } from 'sextant';
+import { samplePath, crossings, fitCircle, family, makeDataSpace } from 'sextant';
 
 const space = makeDataSpace(originInPagePx, oneUnitInPagePx);
 const points = samplePath(document.querySelector('svg path'), space.toData);
 
 crossings(points);      // x values where the curve meets y = 0
 fitCircle(points);       // { cx, cy, r }
+family(points);          // 'linear' | 'quadratic' | 'exponential' | null
 ```
 
 ```sh
-npm test
+npm test          # 16 tests, node --test
+npm run build     # concatenates src/ into public/sextant.js for the demo
 ```
 
 ## Demo
 
-`public/index.html` — draw a curve and watch the measurements come back. It
-reads the rendered path, never the point list it drew with.
+Live at https://sextant.heyitsmejosh.com — draw a curve and watch the
+measurements come back. It reads the rendered path, never the point list it
+drew with.
 
 MIT.

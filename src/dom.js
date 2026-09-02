@@ -40,6 +40,57 @@ export function labelEdges(labels, segments) {
   }).filter(Boolean);
 }
 
+const xy = (p) => (Array.isArray(p) ? p : [p.x, p.y]);
+
+/**
+ * Assign each label to a distinct point, minimising TOTAL distance. Labels sit
+ * offset from their points, consistently to one side, so greedy nearest-first
+ * steals the wrong point; with a handful of labels the exact search is cheap.
+ * Returns point indices in label order, or null.
+ */
+export function assign(labels, points, max = 8) {
+  const n = labels.length;
+  if (!n || points.length < n || n > max) return null;
+  let best = null, bestCost = Infinity;
+  const walk = (chosen, cost) => {
+    if (cost >= bestCost) return;
+    if (chosen.length === n) { bestCost = cost; best = chosen.slice(); return; }
+    const [lx, ly] = xy(labels[chosen.length]);
+    for (let i = 0; i < points.length; i++) {
+      if (chosen.includes(i)) continue;
+      const [px, py] = xy(points[i]);
+      chosen.push(i);
+      walk(chosen, cost + Math.hypot(px - lx, py - ly));
+      chosen.pop();
+    }
+  };
+  walk([], 0);
+  return best;
+}
+
+/**
+ * Moves that turn the bins the widget currently shows into the bins `values`
+ * demands: a dot plot with too many dots on 3 and too few on 5 wants one dot
+ * dragged from 3 to 5. Returns [{ item, to }] or null when counts disagree.
+ * Which pointer performs the drag is the caller's problem; some widgets only
+ * answer to a real OS mouse.
+ */
+export function rebalance(items, values, key = (p) => p.x) {
+  const need = new Map();
+  for (const v of values) need.set(v, (need.get(v) || 0) + 1);
+  const have = new Map();
+  const surplus = [];
+  for (const it of items) {
+    const k = key(it);
+    have.set(k, (have.get(k) || 0) + 1);
+    if (have.get(k) > (need.get(k) || 0)) surplus.push(it);
+  }
+  const deficit = [];
+  for (const [k, n] of need) for (let c = have.get(k) || 0; c < n; c++) deficit.push(k);
+  if (surplus.length !== deficit.length) return null;
+  return surplus.map((item, i) => ({ item, to: deficit[i] }));
+}
+
 /** Straight segments of every path in a container, in one coordinate space. */
 export function segments(root, map, minLength = 4) {
   const out = [];

@@ -72,18 +72,74 @@ export function fitCircle(points) {
   return { cx, cy, r };
 }
 
-function solve3(A, b) {
+function solve3(A, b) { return solve(A, b); }
+
+// Gauss-Jordan with partial pivoting; the systems here are 2x2 or 3x3.
+function solve(A, b) {
+  const n = b.length;
   const M = A.map((row, i) => [...row, b[i]]);
-  for (let c = 0; c < 3; c++) {
+  for (let c = 0; c < n; c++) {
     let p = c;
-    for (let r = c + 1; r < 3; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r;
+    for (let r = c + 1; r < n; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r;
     if (Math.abs(M[p][c]) < 1e-12) return null;
     [M[c], M[p]] = [M[p], M[c]];
-    for (let r = 0; r < 3; r++) {
+    for (let r = 0; r < n; r++) {
       if (r === c) continue;
       const f = M[r][c] / M[c][c];
-      for (let k = c; k < 4; k++) M[r][k] -= f * M[c][k];
+      for (let k = c; k <= n; k++) M[r][k] -= f * M[c][k];
     }
   }
-  return [M[0][3] / M[0][0], M[1][3] / M[1][1], M[2][3] / M[2][2]];
+  return M.map((row, i) => row[n] / row[i]);
+}
+
+/** Least-squares coefficients for y = sum(c_i * basis_i(x)). */
+function fitBasis(xs, ys, basis) {
+  const k = basis.length;
+  const A = Array.from({ length: k }, () => new Array(k).fill(0));
+  const b = new Array(k).fill(0);
+  xs.forEach((x, i) => {
+    const f = basis.map((g) => g(x));
+    for (let r = 0; r < k; r++) {
+      b[r] += f[r] * ys[i];
+      for (let c = 0; c < k; c++) A[r][c] += f[r] * f[c];
+    }
+  });
+  return solve(A, b);
+}
+
+function rms(xs, ys, model) {
+  return Math.sqrt(xs.reduce((s, x, i) => s + (model(x) - ys[i]) ** 2, 0) / xs.length);
+}
+
+/**
+ * Which family a set of points belongs to: 'linear', 'quadratic',
+ * 'exponential', or null. Works for a value table (four rows is enough) and
+ * for a sampled curve alike, since it fits each model rather than taking
+ * finite differences, which fall apart the moment x is unevenly spaced.
+ * Models are tried fewest-parameters-first, so an exact geometric table is
+ * exponential even though a quadratic would also pass through it.
+ */
+export function family(points, tol = 0.02) {
+  const P = points.filter((p) => isFinite(p[0]) && isFinite(p[1]));
+  if (P.length < 4) return null;
+  const xs = P.map((p) => p[0]), ys = P.map((p) => p[1]);
+  const scale = Math.max(1e-9, Math.max(...ys) - Math.min(...ys));
+  const fits = (model) => rms(xs, ys, model) / scale < tol;
+  const lin = fitBasis(xs, ys, [() => 1, (x) => x]);
+  if (lin && fits((x) => lin[0] + lin[1] * x)) return 'linear';
+  const sign = ys.every((v) => v > 0) ? 1 : ys.every((v) => v < 0) ? -1 : 0;
+  if (sign) {
+    const e = fitBasis(xs, ys.map((v) => Math.log(sign * v)), [() => 1, (x) => x]);
+    if (e && fits((x) => sign * Math.exp(e[0] + e[1] * x))) return 'exponential';
+  }
+  const q = fitBasis(xs, ys, [() => 1, (x) => x, (x) => x * x]);
+  if (q && fits((x) => q[0] + q[1] * x + q[2] * x * x)) return 'quadratic';
+  return null;
+}
+
+/** Mean of a point list: where to click a wedge or a blob, in whatever space it was sampled. */
+export function centroid(points) {
+  if (!points.length) return null;
+  const s = points.reduce((a, p) => [a[0] + p[0], a[1] + p[1]], [0, 0]);
+  return [s[0] / points.length, s[1] / points.length];
 }

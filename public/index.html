@@ -1,97 +1,203 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Sextant</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sextant — read real values out of rendered graphics</title>
+<meta name="description" content="A small JavaScript library that recovers the numbers behind charts, diagrams and widgets that only exist as drawn output.">
+<meta name="theme-color" content="#c2451f">
+<meta property="og:title" content="Sextant — read real values out of rendered graphics">
+<meta property="og:description" content="A small JavaScript library that recovers the numbers behind charts, diagrams and widgets that only exist as drawn output.">
+<meta property="og:type" content="website">
 <style>
-  :root{
-    --bg:#fbfbfa; --panel:#fff; --ink:#1a1a18; --muted:#6b6b66;
-    --line:#e3e3df; --accent:#c2451f; --grid:#ecece8;
-    --font:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Helvetica,Arial,sans-serif;
+@import url("https://heyitsmejosh.com/tokens.css");
+
+:root {
+  --accent: #c2451f;
+  --link: #a33a19;
+  --accent-soft: #fbeee8;
+  --bg: #ffffff;
+  --bg2: #f7f7f8;
+  --text: #1c1d22;
+  --text2: #5c5f6a;
+  --border: #e6e7ea;
+  --font-body: -apple-system, system-ui, "Inter", "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121316; --bg2: #1a1b1f; --link: #e8703f;
+    --text: #ececf0; --text2: rgba(236,236,240,0.62);
+    --border: rgba(236,236,240,0.12); --accent-soft: #1f1613;
   }
-  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-    --bg:#121211; --panel:#1a1a19; --ink:#f0efe9; --muted:#9a9a93;
-    --line:#2c2c29; --accent:#e8703f; --grid:#232320;
-  }}
-  :root[data-theme="dark"]{
-    --bg:#121211; --panel:#1a1a19; --ink:#f0efe9; --muted:#9a9a93;
-    --line:#2c2c29; --accent:#e8703f; --grid:#232320;
-  }
-  *{box-sizing:border-box}
-  body{background:var(--bg);color:var(--ink);font-family:var(--font);line-height:1.5}
-  .wrap{max-width:1080px;margin:0 auto;padding:56px 24px 96px}
-  h1{font-size:34px;letter-spacing:-.02em;margin:0 0 6px;font-weight:600}
-  .tag{color:var(--muted);font-size:16px;margin:0 0 40px;max-width:62ch}
-  .demo{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;align-items:start}
-  @media (max-width:820px){.demo{grid-template-columns:1fr}}
-  .panel{background:var(--panel);border:1px solid var(--line);border-radius:12px}
-  .stage{padding:10px;position:relative}
-  svg{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair}
-  .read{padding:18px 20px}
-  .read h2{font-size:12px;text-transform:uppercase;letter-spacing:.09em;
-    color:var(--muted);margin:0 0 14px;font-weight:600}
-  .row{display:flex;justify-content:space-between;gap:12px;padding:7px 0;
-    border-bottom:1px solid var(--line);font-size:14px}
-  .row:last-child{border-bottom:0}
-  .row span:last-child{font-variant-numeric:tabular-nums;font-weight:600}
-  .hint{color:var(--muted);font-size:13px;margin:14px 0 0}
-  .bar{display:flex;gap:8px;margin:0 0 16px;flex-wrap:wrap}
-  button{font:inherit;font-size:13px;padding:7px 13px;border-radius:8px;
-    border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
-  button:hover{border-color:var(--muted)}
-  button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
-  .note{margin-top:44px;border-top:1px solid var(--line);padding-top:26px;
-    color:var(--muted);font-size:14px;max-width:68ch}
-  .note strong{color:var(--ink);font-weight:600}
-  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;
-    background:var(--grid);padding:1px 5px;border-radius:4px}
+}
+:root[data-theme="dark"] {
+  --bg: #121316; --bg2: #1a1b1f; --link: #e8703f;
+  --text: #ececf0; --text2: rgba(236,236,240,0.62);
+  --border: rgba(236,236,240,0.12); --accent-soft: #1f1613;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg); color: var(--text); font-family: var(--font-body);
+  line-height: 1.6; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+::selection { background: var(--accent); color: #fff; }
+a { color: var(--link, var(--accent)); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.container { max-width: 760px; margin: 0 auto; padding: 0 1.5rem; }
+.container.wide { max-width: 1080px; }
+
+.hero { background: var(--accent-soft); padding: 5.5rem 0 4.5rem; text-align: center; }
+.hero h1 { font-size: clamp(2.25rem, 6.5vw, 3.5rem); font-weight: 700; letter-spacing: -0.025em; line-height: 1.08; margin-bottom: 0.85rem; }
+.hero p { font-size: clamp(1.05rem, 2.4vw, 1.25rem); color: var(--text2); max-width: 34rem; margin: 0 auto 2.25rem; }
+
+.buttons { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+.btn {
+  display: inline-block; padding: 0.7rem 1.5rem; border-radius: 100px; font-size: 0.98rem;
+  font-weight: 600; border: 1.5px solid transparent; transition: transform 0.15s ease, opacity 0.15s ease;
+}
+.btn:hover { text-decoration: none; transform: translateY(-1px); }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { opacity: 0.9; }
+.btn-outline { border-color: var(--border); color: var(--text); background: var(--bg); }
+.btn-outline:hover { border-color: var(--link, var(--accent)); color: var(--link, var(--accent)); }
+
+section { padding: 4rem 0; }
+section h2 { font-size: clamp(1.5rem, 3.6vw, 2rem); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 2.25rem; text-align: center; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; }
+.feature { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 1.4rem; }
+.feature h3 { font-size: 1rem; font-weight: 650; margin-bottom: 0.4rem; }
+.feature p { font-size: 0.93rem; color: var(--text2); }
+
+/* demo */
+.bar { display: flex; gap: 0.5rem; margin: 0 0 1rem; flex-wrap: wrap; justify-content: center; }
+.bar button {
+  font: inherit; font-size: 0.85rem; padding: 0.45rem 0.9rem; border-radius: 100px;
+  border: 1.5px solid var(--border); background: var(--bg); color: var(--text); cursor: pointer;
+}
+.bar button:hover { border-color: var(--link, var(--accent)); color: var(--link, var(--accent)); }
+.demo { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 1.5rem; align-items: start; }
+@media (max-width: 820px) { .demo { grid-template-columns: 1fr; } }
+.panel { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; }
+.stage { padding: 10px; }
+svg { display: block; width: 100%; height: auto; touch-action: none; cursor: crosshair; }
+.read { padding: 1.2rem 1.4rem; }
+.read h3 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text2); margin: 0 0 0.8rem; font-weight: 650; }
+.row { display: flex; justify-content: space-between; gap: 12px; padding: 0.45rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+.row:last-of-type { border-bottom: 0; }
+.row span:last-child { font-variant-numeric: tabular-nums; font-weight: 600; text-align: right; }
+.hint { color: var(--text2); font-size: 0.85rem; margin: 0.9rem 0 0; }
+
+pre { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 1.2rem 1.4rem; overflow-x: auto; font-size: 0.85rem; line-height: 1.55; }
+code { font-family: var(--font-code, ui-monospace, Menlo, monospace); }
+p code { background: var(--bg2); padding: 1px 5px; border-radius: 4px; font-size: 0.9em; }
+.closing p { color: var(--text2); max-width: 40rem; margin: 0 auto 1.5rem; text-align: center; }
+
+footer { padding: 2.5rem 0 3.5rem; text-align: center; font-size: 0.9rem; color: var(--text2); }
+footer p + p { margin-top: 0.35rem; }
+a.skip { position: absolute; left: -9999px; }
+a.skip:focus { position: fixed; left: 1rem; top: 1rem; z-index: 99; padding: 0.5rem 0.9rem; background: var(--bg2); border: 1px solid var(--border); color: var(--text); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>Sextant</h1>
-  <p class="tag">A sextant fixes your position by observing what's visible, without
-     instrumenting anything. This library does the same for a web page: it reads
-     real values out of rendered graphics. Draw below — nothing here knows what
-     you meant to draw, it only measures what's on screen.</p>
+<a class="skip" href="#main">Skip to content</a>
+<main id="main">
 
-  <div class="bar">
-    <button id="clear">Clear</button>
-    <button id="ex-parabola">Example: parabola</button>
-    <button id="ex-arc">Example: arc</button>
-  </div>
-
-  <div class="demo">
-    <div class="panel stage">
-      <svg id="board" viewBox="0 0 640 440" aria-label="Drawing area with a coordinate grid"></svg>
-    </div>
-    <div class="panel read">
-      <h2>Measured from the drawing</h2>
-      <div class="row"><span>Samples</span><span id="m-n">—</span></div>
-      <div class="row"><span>x range</span><span id="m-x">—</span></div>
-      <div class="row"><span>y range</span><span id="m-y">—</span></div>
-      <div class="row"><span>Crosses y=0 at</span><span id="m-roots">—</span></div>
-      <div class="row"><span>Branch</span><span id="m-kind">—</span></div>
-      <div class="row"><span>Circle fit</span><span id="m-circle">—</span></div>
-      <p class="hint">Every number is derived from the drawn path — sampled,
-         mapped out of SVG user units, and reported in grid coordinates.</p>
+<section class="hero">
+  <div class="container">
+    <h1>Sextant</h1>
+    <p>A sextant fixes your position by observing what is visible, without instrumenting anything it measures. This library does the same for a web page: it reads real values out of rendered graphics.</p>
+    <div class="buttons">
+      <a class="btn btn-primary" href="#demo">Try the demo</a>
+      <a class="btn btn-outline" href="https://github.com/nulljosh/sextant">Source on GitHub</a>
     </div>
   </div>
+</section>
 
-  <p class="note"><strong>Why this is harder than it looks.</strong> A browser
-     graphic lives in four coordinate spaces at once: SVG user units, CSS pixels,
-     the frame's own viewport, and screenshot space. Mixing any two produces
-     plausible numbers rather than an error, so a reading can be quietly wrong
-     for hours. <code>sextant</code> keeps each conversion explicit, samples paths
-     into data space, matches labels to the edges they annotate, and compares
-     expressions by fingerprint rather than by string — because
-     <code>x(x+8)</code> and <code>x²+8x</code> look nothing alike, and agree at
-     exactly the point you'd test first.</p>
-</div>
+<section class="features">
+  <div class="container">
+    <h2>What it reads</h2>
+    <div class="grid">
+      <div class="feature">
+        <h3>Coordinates</h3>
+        <p>SVG user units, CSS pixels, an iframe's viewport and screenshot space, with every conversion explicit. Mixing two gives plausible numbers, never an error.</p>
+      </div>
+      <div class="feature">
+        <h3>Curves</h3>
+        <p>Sample a drawn path into data space, find where it crosses a level, fit a circle from a partial arc, and tell linear from quadratic from exponential.</p>
+      </div>
+      <div class="feature">
+        <h3>Expressions</h3>
+        <p>Compare rendered maths by fingerprint over several sample points. <code>x(x+8)</code> and <code>x²+8x</code> share no characters and agree at exactly the point you would test first.</p>
+      </div>
+      <div class="feature">
+        <h3>Widgets</h3>
+        <p>Pick the iframe that is actually visible, pin labels to the edges and points they annotate, plan the drags a dot plot needs, and click in a way frameworks accept.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="demo">
+  <div class="container wide">
+    <h2>Draw something. It only measures what is on screen.</h2>
+    <div class="bar">
+      <button id="clear">Clear</button>
+      <button data-ex="parabola">Parabola</button>
+      <button data-ex="exp">Exponential</button>
+      <button data-ex="sine">Sine</button>
+      <button data-ex="hyperbola">Hyperbola</button>
+      <button data-ex="step">Step</button>
+      <button data-ex="arc">Arc</button>
+      <button data-ex="circle">Full circle</button>
+      <button data-ex="piecewise">Piecewise pair</button>
+    </div>
+    <div class="demo">
+      <div class="panel stage">
+        <svg id="board" viewBox="0 0 640 440" aria-label="Drawing area with a coordinate grid"></svg>
+      </div>
+      <div class="panel read">
+        <h3>Measured from the drawing</h3>
+        <div class="row"><span>Samples</span><span id="m-n">—</span></div>
+        <div class="row"><span>x range</span><span id="m-x">—</span></div>
+        <div class="row"><span>y range</span><span id="m-y">—</span></div>
+        <div class="row"><span>Crosses y=0 at</span><span id="m-roots">—</span></div>
+        <div class="row"><span>Branch</span><span id="m-kind">—</span></div>
+        <div class="row"><span>Family</span><span id="m-family">—</span></div>
+        <div class="row"><span>Circle fit</span><span id="m-circle">—</span></div>
+        <p class="hint">Every number is derived from the rendered path: sampled, mapped out of SVG user units, and reported in grid coordinates. The demo never hands over the points it drew with.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="closing">
+  <div class="container">
+    <h2>Use it</h2>
+<pre><code>import { samplePath, crossings, fitCircle, family, makeDataSpace } from 'sextant';
+
+const space = makeDataSpace(originInPagePx, oneUnitInPagePx);
+const points = samplePath(document.querySelector('svg path'), space.toData);
+
+crossings(points);   // x values where the curve meets y = 0
+fitCircle(points);   // { cx, cy, r }, works on a partial arc
+family(points);      // 'linear' | 'quadratic' | 'exponential' | null</code></pre>
+  </div>
+</section>
+
+</main>
+<footer>
+  <div class="container">
+    <p>Sextant &mdash; by <a href="https://heyitsmejosh.com">Joshua Trommel</a></p>
+    <p><a href="https://github.com/nulljosh/sextant">Source on GitHub</a> &middot; MIT</p>
+  </div>
+</footer>
 
 <script type="module">
-import { crossings, describe, fitCircle } from './sextant.js';
+import { samplePath, crossings, describe, fitCircle, family } from './sextant.js';
 
 const svg = document.getElementById('board');
 const NS = 'http://www.w3.org/2000/svg';
@@ -105,15 +211,11 @@ const fmt = (v) => (Math.abs(v) < 5e-3 ? 0 : v).toFixed(2).replace(/\.00$/, '');
 function grid() {
   const g = el('g', {});
   for (let x = ORIGIN.x % UNIT; x < W; x += UNIT)
-    g.appendChild(el('line', { x1: x, y1: 0, x2: x, y2: H,
-      stroke: 'var(--grid)', 'stroke-width': 1 }));
+    g.appendChild(el('line', { x1: x, y1: 0, x2: x, y2: H, stroke: 'var(--border)', 'stroke-width': 1 }));
   for (let y = ORIGIN.y % UNIT; y < H; y += UNIT)
-    g.appendChild(el('line', { x1: 0, y1: y, x2: W, y2: y,
-      stroke: 'var(--grid)', 'stroke-width': 1 }));
-  g.appendChild(el('line', { x1: 0, y1: ORIGIN.y, x2: W, y2: ORIGIN.y,
-    stroke: 'var(--line)', 'stroke-width': 1.5 }));
-  g.appendChild(el('line', { x1: ORIGIN.x, y1: 0, x2: ORIGIN.x, y2: H,
-    stroke: 'var(--line)', 'stroke-width': 1.5 }));
+    g.appendChild(el('line', { x1: 0, y1: y, x2: W, y2: y, stroke: 'var(--border)', 'stroke-width': 1 }));
+  g.appendChild(el('line', { x1: 0, y1: ORIGIN.y, x2: W, y2: ORIGIN.y, stroke: 'var(--text2)', 'stroke-width': 1.5 }));
+  g.appendChild(el('line', { x1: ORIGIN.x, y1: 0, x2: ORIGIN.x, y2: H, stroke: 'var(--text2)', 'stroke-width': 1.5 }));
   return g;
 }
 
@@ -129,8 +231,7 @@ function reset() {
 
 function at(ev) {
   const r = svg.getBoundingClientRect();
-  return { x: (ev.clientX - r.left) * (W / r.width),
-           y: (ev.clientY - r.top) * (H / r.height) };
+  return { x: (ev.clientX - r.left) * (W / r.width), y: (ev.clientY - r.top) * (H / r.height) };
 }
 svg.addEventListener('pointerdown', (e) => {
   drawing = true; pts = [at(e)]; svg.setPointerCapture(e.pointerId); redraw();
@@ -147,33 +248,19 @@ function redraw() {
     (i ? 'L' : 'M') + p.x.toFixed(1) + ' ' + p.y.toFixed(1)).join(' '));
 }
 
-// This is the library's job, not the demo's: sample the rendered path and map
-// it out of user units. The demo never passes its own point list along.
-function sampleRendered(p, n = 160) {
-  const L = p.getTotalLength();
-  if (!L) return [];
-  const m = p.ownerSVGElement.getScreenCTM();
-  const box = svg.getBoundingClientRect();
-  const out = [];
-  for (let i = 0; i <= n; i++) {
-    const q = p.getPointAtLength((L * i) / n);
-    const sx = m.a * q.x + m.c * q.y + m.e;
-    const sy = m.b * q.x + m.d * q.y + m.f;
-    out.push(toData((sx - box.left) * (W / box.width),
-                    (sy - box.top) * (H / box.height)));
-  }
-  return out;
-}
-
+// The library samples the RENDERED path in screen space; the demo only says
+// how screen pixels map back to its grid.
 function measure() {
   if (pts.length < 3) return report(null);
-  report(sampleRendered(path));
+  const box = svg.getBoundingClientRect();
+  report(samplePath(path, (sx, sy) =>
+    toData((sx - box.left) * (W / box.width), (sy - box.top) * (H / box.height))));
 }
 
 function report(data) {
   const set = (id, v) => (document.getElementById(id).textContent = v);
   if (!data || !data.length) {
-    ['m-n','m-x','m-y','m-roots','m-kind','m-circle'].forEach((i) => set(i, '—'));
+    ['m-n','m-x','m-y','m-roots','m-kind','m-family','m-circle'].forEach((i) => set(i, '—'));
     return;
   }
   const d = describe(data);
@@ -183,32 +270,38 @@ function report(data) {
   const r = crossings(data);
   set('m-roots', r.length ? r.map(fmt).join(', ') : 'never');
   set('m-kind', d.flat ? 'horizontal' : d.vertical ? 'vertical' : 'slanted / curved');
+  set('m-family', family(data) || 'none of the three');
   const c = fitCircle(data);
   const err = c ? data.reduce((s, [x, y]) =>
     s + Math.abs(Math.hypot(x - c.cx, y - c.cy) - c.r), 0) / data.length : 9;
   set('m-circle', c && err < 0.12
-    ? 'centre (' + fmt(c.cx) + ', ' + fmt(c.cy) + ')  r=' + fmt(c.r)
-    : 'not a circle');
+    ? 'centre (' + fmt(c.cx) + ', ' + fmt(c.cy) + ')  r=' + fmt(c.r) : 'not a circle');
 }
 
-function drawFn(f, x0, x1) {
+function drawFn(f, x0, x1, step = 0.05) {
   reset();
-  pts = [];
-  for (let x = x0; x <= x1; x += 0.05)
-    pts.push({ x: ORIGIN.x + x * UNIT, y: ORIGIN.y - f(x) * UNIT });
+  for (let x = x0; x <= x1; x += step) pts.push({ x: ORIGIN.x + x * UNIT, y: ORIGIN.y - f(x) * UNIT });
+  redraw(); measure();
+}
+function drawArc(cx, cy, r, a0, a1) {
+  reset();
+  for (let a = a0; a <= a1; a += 0.03)
+    pts.push({ x: ORIGIN.x + (cx + r * Math.cos(a)) * UNIT, y: ORIGIN.y - (cy + r * Math.sin(a)) * UNIT });
   redraw(); measure();
 }
 
-document.getElementById('clear').onclick = reset;
-document.getElementById('ex-parabola').onclick = () =>
-  drawFn((x) => 0.5 * (x * x - 4), -3.4, 3.4);
-document.getElementById('ex-arc').onclick = () => {
-  reset(); pts = [];
-  for (let a = -2.4; a <= 0.7; a += 0.03)
-    pts.push({ x: ORIGIN.x + (1 + 2.2 * Math.cos(a)) * UNIT,
-               y: ORIGIN.y - (-0.5 + 2.2 * Math.sin(a)) * UNIT });
-  redraw(); measure();
+const examples = {
+  parabola: () => drawFn((x) => 0.5 * (x * x - 4), -3.4, 3.4),
+  exp: () => drawFn((x) => 0.5 * 2 ** x, -7.5, 3.1),
+  sine: () => drawFn((x) => 2 * Math.sin(x), -7.5, 7.5),
+  hyperbola: () => drawFn((x) => 3 / x, 0.65, 7.5),
+  step: () => drawFn((x) => Math.floor(x), -4, 4, 0.02),
+  arc: () => drawArc(1, -0.5, 2.2, -2.4, 0.7),
+  circle: () => drawArc(-1, 1, 3, 0, 2 * Math.PI + 0.03),
+  piecewise: () => drawFn((x) => (x < -1 ? -0.5 * x - 1 : 0.5 * (x + 1) ** 2 - 0.5), -7, 3.6),
 };
+document.getElementById('clear').onclick = reset;
+for (const b of document.querySelectorAll('[data-ex]')) b.onclick = examples[b.dataset.ex];
 
 reset();
 </script>
