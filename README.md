@@ -54,7 +54,8 @@ beside it, so nothing depends on a web view.
 cd ios && xcodegen generate                       # then open Seamark.xcodeproj
 swiftc -o /tmp/smcheck ios/App/Engine.swift ios/Checks/main.swift && /tmp/smcheck
 
-cd kmp && ./gradlew :shared:jvmTest               # Kotlin engine tests
+cd kmp && export JAVA_HOME=$(brew --prefix openjdk@17)/libexec/openjdk.jdk/Contents/Home  # D8 rejects newer JDKs
+./gradlew :shared:jvmTest                         # Kotlin engine tests
 ./gradlew :composeApp:assembleDebug               # Android APK
 ./gradlew :composeApp:packageDistributionForCurrentOS
 ```
