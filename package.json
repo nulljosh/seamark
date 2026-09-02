@@ -1,0 +1,9 @@
+{
+  "name": "sextant",
+  "version": "0.1.0",
+  "description": "Read state out of live browser graphics",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": { "test": "node --test test/*.test.mjs" },
+  "license": "MIT"
+}

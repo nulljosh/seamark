@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sextant</title>
+<style>
+  :root{
+    --bg:#fbfbfa; --panel:#fff; --ink:#1a1a18; --muted:#6b6b66;
+    --line:#e3e3df; --accent:#c2451f; --grid:#ecece8;
+    --font:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    --bg:#121211; --panel:#1a1a19; --ink:#f0efe9; --muted:#9a9a93;
+    --line:#2c2c29; --accent:#e8703f; --grid:#232320;
+  }}
+  :root[data-theme="dark"]{
+    --bg:#121211; --panel:#1a1a19; --ink:#f0efe9; --muted:#9a9a93;
+    --line:#2c2c29; --accent:#e8703f; --grid:#232320;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--font);line-height:1.5}
+  .wrap{max-width:1080px;margin:0 auto;padding:56px 24px 96px}
+  h1{font-size:34px;letter-spacing:-.02em;margin:0 0 6px;font-weight:600}
+  .tag{color:var(--muted);font-size:16px;margin:0 0 40px;max-width:62ch}
+  .demo{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;align-items:start}
+  @media (max-width:820px){.demo{grid-template-columns:1fr}}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:12px}
+  .stage{padding:10px;position:relative}
+  svg{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair}
+  .read{padding:18px 20px}
+  .read h2{font-size:12px;text-transform:uppercase;letter-spacing:.09em;
+    color:var(--muted);margin:0 0 14px;font-weight:600}
+  .row{display:flex;justify-content:space-between;gap:12px;padding:7px 0;
+    border-bottom:1px solid var(--line);font-size:14px}
+  .row:last-child{border-bottom:0}
+  .row span:last-child{font-variant-numeric:tabular-nums;font-weight:600}
+  .hint{color:var(--muted);font-size:13px;margin:14px 0 0}
+  .bar{display:flex;gap:8px;margin:0 0 16px;flex-wrap:wrap}
+  button{font:inherit;font-size:13px;padding:7px 13px;border-radius:8px;
+    border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
+  button:hover{border-color:var(--muted)}
+  button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+  .note{margin-top:44px;border-top:1px solid var(--line);padding-top:26px;
+    color:var(--muted);font-size:14px;max-width:68ch}
+  .note strong{color:var(--ink);font-weight:600}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;
+    background:var(--grid);padding:1px 5px;border-radius:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Sextant</h1>
+  <p class="tag">A sextant fixes your position by observing what's visible, without
+     instrumenting anything. This library does the same for a web page: it reads
+     real values out of rendered graphics. Draw below — nothing here knows what
+     you meant to draw, it only measures what's on screen.</p>
+
+  <div class="bar">
+    <button id="clear">Clear</button>
+    <button id="ex-parabola">Example: parabola</button>
+    <button id="ex-arc">Example: arc</button>
+  </div>
+
+  <div class="demo">
+    <div class="panel stage">
+      <svg id="board" viewBox="0 0 640 440" aria-label="Drawing area with a coordinate grid"></svg>
+    </div>
+    <div class="panel read">
+      <h2>Measured from the drawing</h2>
+      <div class="row"><span>Samples</span><span id="m-n">—</span></div>
+      <div class="row"><span>x range</span><span id="m-x">—</span></div>
+      <div class="row"><span>y range</span><span id="m-y">—</span></div>
+      <div class="row"><span>Crosses y=0 at</span><span id="m-roots">—</span></div>
+      <div class="row"><span>Branch</span><span id="m-kind">—</span></div>
+      <div class="row"><span>Circle fit</span><span id="m-circle">—</span></div>
+      <p class="hint">Every number is derived from the drawn path — sampled,
+         mapped out of SVG user units, and reported in grid coordinates.</p>
+    </div>
+  </div>
+
+  <p class="note"><strong>Why this is harder than it looks.</strong> A browser
+     graphic lives in four coordinate spaces at once: SVG user units, CSS pixels,
+     the frame's own viewport, and screenshot space. Mixing any two produces
+     plausible numbers rather than an error, so a reading can be quietly wrong
+     for hours. <code>sextant</code> keeps each conversion explicit, samples paths
+     into data space, matches labels to the edges they annotate, and compares
+     expressions by fingerprint rather than by string — because
+     <code>x(x+8)</code> and <code>x²+8x</code> look nothing alike, and agree at
+     exactly the point you'd test first.</p>
+</div>
+
+<script type="module">
+import { crossings, describe, fitCircle } from './sextant.js';
+
+const svg = document.getElementById('board');
+const NS = 'http://www.w3.org/2000/svg';
+const W = 640, H = 440, ORIGIN = { x: 320, y: 220 }, UNIT = 40;
+
+const el = (n, a) => { const e = document.createElementNS(NS, n);
+  for (const k in a) e.setAttribute(k, a[k]); return e; };
+const toData = (px, py) => [(px - ORIGIN.x) / UNIT, -(py - ORIGIN.y) / UNIT];
+const fmt = (v) => (Math.abs(v) < 5e-3 ? 0 : v).toFixed(2).replace(/\.00$/, '');
+
+function grid() {
+  const g = el('g', {});
+  for (let x = ORIGIN.x % UNIT; x < W; x += UNIT)
+    g.appendChild(el('line', { x1: x, y1: 0, x2: x, y2: H,
+      stroke: 'var(--grid)', 'stroke-width': 1 }));
+  for (let y = ORIGIN.y % UNIT; y < H; y += UNIT)
+    g.appendChild(el('line', { x1: 0, y1: y, x2: W, y2: y,
+      stroke: 'var(--grid)', 'stroke-width': 1 }));
+  g.appendChild(el('line', { x1: 0, y1: ORIGIN.y, x2: W, y2: ORIGIN.y,
+    stroke: 'var(--line)', 'stroke-width': 1.5 }));
+  g.appendChild(el('line', { x1: ORIGIN.x, y1: 0, x2: ORIGIN.x, y2: H,
+    stroke: 'var(--line)', 'stroke-width': 1.5 }));
+  return g;
+}
+
+let path = null, drawing = false, pts = [];
+function reset() {
+  svg.replaceChildren(grid());
+  path = el('path', { fill: 'none', stroke: 'var(--accent)',
+    'stroke-width': 2.5, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' });
+  svg.appendChild(path);
+  pts = [];
+  report(null);
+}
+
+function at(ev) {
+  const r = svg.getBoundingClientRect();
+  return { x: (ev.clientX - r.left) * (W / r.width),
+           y: (ev.clientY - r.top) * (H / r.height) };
+}
+svg.addEventListener('pointerdown', (e) => {
+  drawing = true; pts = [at(e)]; svg.setPointerCapture(e.pointerId); redraw();
+});
+svg.addEventListener('pointermove', (e) => {
+  if (!drawing) return;
+  const p = at(e), last = pts[pts.length - 1];
+  if (Math.hypot(p.x - last.x, p.y - last.y) > 2.5) { pts.push(p); redraw(); }
+});
+svg.addEventListener('pointerup', () => { drawing = false; measure(); });
+
+function redraw() {
+  path.setAttribute('d', pts.map((p, i) =>
+    (i ? 'L' : 'M') + p.x.toFixed(1) + ' ' + p.y.toFixed(1)).join(' '));
+}
+
+// This is the library's job, not the demo's: sample the rendered path and map
+// it out of user units. The demo never passes its own point list along.
+function sampleRendered(p, n = 160) {
+  const L = p.getTotalLength();
+  if (!L) return [];
+  const m = p.ownerSVGElement.getScreenCTM();
+  const box = svg.getBoundingClientRect();
+  const out = [];
+  for (let i = 0; i <= n; i++) {
+    const q = p.getPointAtLength((L * i) / n);
+    const sx = m.a * q.x + m.c * q.y + m.e;
+    const sy = m.b * q.x + m.d * q.y + m.f;
+    out.push(toData((sx - box.left) * (W / box.width),
+                    (sy - box.top) * (H / box.height)));
+  }
+  return out;
+}
+
+function measure() {
+  if (pts.length < 3) return report(null);
+  report(sampleRendered(path));
+}
+
+function report(data) {
+  const set = (id, v) => (document.getElementById(id).textContent = v);
+  if (!data || !data.length) {
+    ['m-n','m-x','m-y','m-roots','m-kind','m-circle'].forEach((i) => set(i, '—'));
+    return;
+  }
+  const d = describe(data);
+  set('m-n', data.length);
+  set('m-x', fmt(d.x0) + ' … ' + fmt(d.x1));
+  set('m-y', fmt(d.y0) + ' … ' + fmt(d.y1));
+  const r = crossings(data);
+  set('m-roots', r.length ? r.map(fmt).join(', ') : 'never');
+  set('m-kind', d.flat ? 'horizontal' : d.vertical ? 'vertical' : 'slanted / curved');
+  const c = fitCircle(data);
+  const err = c ? data.reduce((s, [x, y]) =>
+    s + Math.abs(Math.hypot(x - c.cx, y - c.cy) - c.r), 0) / data.length : 9;
+  set('m-circle', c && err < 0.12
+    ? 'centre (' + fmt(c.cx) + ', ' + fmt(c.cy) + ')  r=' + fmt(c.r)
+    : 'not a circle');
+}
+
+function drawFn(f, x0, x1) {
+  reset();
+  pts = [];
+  for (let x = x0; x <= x1; x += 0.05)
+    pts.push({ x: ORIGIN.x + x * UNIT, y: ORIGIN.y - f(x) * UNIT });
+  redraw(); measure();
+}
+
+document.getElementById('clear').onclick = reset;
+document.getElementById('ex-parabola').onclick = () =>
+  drawFn((x) => 0.5 * (x * x - 4), -3.4, 3.4);
+document.getElementById('ex-arc').onclick = () => {
+  reset(); pts = [];
+  for (let a = -2.4; a <= 0.7; a += 0.03)
+    pts.push({ x: ORIGIN.x + (1 + 2.2 * Math.cos(a)) * UNIT,
+               y: ORIGIN.y - (-0.5 + 2.2 * Math.sin(a)) * UNIT });
+  redraw(); measure();
+};
+
+reset();
+</script>
+</body>
+</html>
