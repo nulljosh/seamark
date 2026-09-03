@@ -52,12 +52,17 @@ Nothing depends on a web view.
 
 - **Web:** https://seamark.heyitsmejosh.com. Draw a curve and watch it get measured.
 - **iPhone, iPad and Mac:** SwiftUI app in `ios/`. `Engine.swift` is the Swift port.
+- **Apple Watch:** standalone SwiftUI app in `watchos/`, same `Engine.swift`. No drawing
+  surface on a watch face, so it pages through six preset curves and shows the same
+  family/roots/circle-fit readings the phone gets from a hand-drawn stroke.
 - **Android, Windows and Linux:** Compose Multiplatform app in `kmp/`.
   `Engine.kt` is the Kotlin port. Desktop packages as MSI, DEB or DMG.
 
 ```sh
 cd ios && xcodegen generate                       # then open Seamark.xcodeproj
 swiftc -o /tmp/smcheck ios/App/Engine.swift ios/Checks/main.swift && /tmp/smcheck
+
+cd watchos && xcodegen generate                    # then open SeamarkWatch.xcodeproj
 
 cd kmp && export JAVA_HOME=$(brew --prefix openjdk@17)/libexec/openjdk.jdk/Contents/Home  # D8 rejects newer JDKs
 ./gradlew :shared:jvmTest                         # Kotlin engine tests

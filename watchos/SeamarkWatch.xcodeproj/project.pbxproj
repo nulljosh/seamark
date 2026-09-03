@@ -1,0 +1,352 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0F5DE4CE454103E6188A5B1C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 365E7243EFE154B891658962 /* Assets.xcassets */; };
+		128F4B44E382189F1822E2FA /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = E61D9E82C8391BECA93B150F /* Theme.swift */; };
+		436056F324C6DE55F950EA24 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11456A34BFA4D1E5A7E127F /* ContentView.swift */; };
+		507E29A620D29F01A16D1FB3 /* Presets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82059C1C0E9272F8B6595DF9 /* Presets.swift */; };
+		5AB5836EC51833F8DC0C0C79 /* L.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538347A48048F28517F1D408 /* L.swift */; };
+		684A0CA3A106F42666D722D8 /* Engine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A12559739233C17991DDBEE8 /* Engine.swift */; };
+		6E5819202BACF5AB66750B4D /* SeamarkWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057339F4531004BE5F6BECEA /* SeamarkWatchApp.swift */; };
+		7901631D30B9E4D161F512BB /* PlotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC4D2BB8A30FBE8CD3C69B89 /* PlotView.swift */; };
+		C24F1324063CD39B78537E11 /* CurvePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87527CFAA8B69D31656D583 /* CurvePageView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		057339F4531004BE5F6BECEA /* SeamarkWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeamarkWatchApp.swift; sourceTree = "<group>"; };
+		365E7243EFE154B891658962 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		404D4868947DAA39AD8476F3 /* SeamarkWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SeamarkWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		538347A48048F28517F1D408 /* L.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = L.swift; sourceTree = "<group>"; };
+		82059C1C0E9272F8B6595DF9 /* Presets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Presets.swift; sourceTree = "<group>"; };
+		A11456A34BFA4D1E5A7E127F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		A12559739233C17991DDBEE8 /* Engine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Engine.swift; sourceTree = "<group>"; };
+		AC4D2BB8A30FBE8CD3C69B89 /* PlotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlotView.swift; sourceTree = "<group>"; };
+		D87527CFAA8B69D31656D583 /* CurvePageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurvePageView.swift; sourceTree = "<group>"; };
+		E61D9E82C8391BECA93B150F /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		1A4FE655DAD902AFDD4AD375 = {
+			isa = PBXGroup;
+			children = (
+				379E6E0CCCB4CC33A27D1176 /* Models */,
+				5E35979C43CD865DEE10505F /* Views */,
+				B5870A5009690870D641F8C5 /* watchos */,
+				9B5CC784CD7C51BF8CD3F5DB /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		379E6E0CCCB4CC33A27D1176 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A12559739233C17991DDBEE8 /* Engine.swift */,
+				538347A48048F28517F1D408 /* L.swift */,
+				82059C1C0E9272F8B6595DF9 /* Presets.swift */,
+				E61D9E82C8391BECA93B150F /* Theme.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		5E35979C43CD865DEE10505F /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				D87527CFAA8B69D31656D583 /* CurvePageView.swift */,
+				AC4D2BB8A30FBE8CD3C69B89 /* PlotView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		9B5CC784CD7C51BF8CD3F5DB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				404D4868947DAA39AD8476F3 /* SeamarkWatch.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B5870A5009690870D641F8C5 /* watchos */ = {
+			isa = PBXGroup;
+			children = (
+				365E7243EFE154B891658962 /* Assets.xcassets */,
+				A11456A34BFA4D1E5A7E127F /* ContentView.swift */,
+				057339F4531004BE5F6BECEA /* SeamarkWatchApp.swift */,
+				379E6E0CCCB4CC33A27D1176 /* Models */,
+				5E35979C43CD865DEE10505F /* Views */,
+			);
+			name = watchos;
+			path = .;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		600446170176A87BA52DC011 /* SeamarkWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 60EB44F7C29B55DA58A8AEDE /* Build configuration list for PBXNativeTarget "SeamarkWatch" */;
+			buildPhases = (
+				7856E5503EB43B940C588D26 /* Sources */,
+				3DA74E02FEF3F0E635691183 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SeamarkWatch;
+			packageProductDependencies = (
+			);
+			productName = SeamarkWatch;
+			productReference = 404D4868947DAA39AD8476F3 /* SeamarkWatch.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		906264CAC0FAF755CA4D7D35 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					600446170176A87BA52DC011 = {
+						DevelopmentTeam = QMM486NPYC;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = FD4002762AD06DB406864B26 /* Build configuration list for PBXProject "SeamarkWatch" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 1A4FE655DAD902AFDD4AD375;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 9B5CC784CD7C51BF8CD3F5DB /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				600446170176A87BA52DC011 /* SeamarkWatch */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		3DA74E02FEF3F0E635691183 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0F5DE4CE454103E6188A5B1C /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		7856E5503EB43B940C588D26 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				436056F324C6DE55F950EA24 /* ContentView.swift in Sources */,
+				C24F1324063CD39B78537E11 /* CurvePageView.swift in Sources */,
+				684A0CA3A106F42666D722D8 /* Engine.swift in Sources */,
+				5AB5836EC51833F8DC0C0C79 /* L.swift in Sources */,
+				7901631D30B9E4D161F512BB /* PlotView.swift in Sources */,
+				507E29A620D29F01A16D1FB3 /* Presets.swift in Sources */,
+				6E5819202BACF5AB66750B4D /* SeamarkWatchApp.swift in Sources */,
+				128F4B44E382189F1822E2FA /* Theme.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		120C98875761C39E2163ECB3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = QMM486NPYC;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
+		23BB73262E450793FE89B260 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "";
+				INFOPLIST_KEY_WKWatchOnly = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nulljosh.seamark.watchos;
+				PRODUCT_NAME = Seamark;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Release;
+		};
+		548DEC8A3B8296A6F53A01BC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "";
+				INFOPLIST_KEY_WKWatchOnly = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nulljosh.seamark.watchos;
+				PRODUCT_NAME = Seamark;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Debug;
+		};
+		8AB42C08111B0EECA0F3AB3F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = QMM486NPYC;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		60EB44F7C29B55DA58A8AEDE /* Build configuration list for PBXNativeTarget "SeamarkWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				548DEC8A3B8296A6F53A01BC /* Debug */,
+				23BB73262E450793FE89B260 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		FD4002762AD06DB406864B26 /* Build configuration list for PBXProject "SeamarkWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8AB42C08111B0EECA0F3AB3F /* Debug */,
+				120C98875761C39E2163ECB3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 906264CAC0FAF755CA4D7D35 /* Project object */;
+}
