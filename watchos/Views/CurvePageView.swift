@@ -10,7 +10,7 @@ struct CurvePageView: View {
     var body: some View {
         VStack(spacing: 4) {
             HStack(spacing: 6) {
-                Circle().fill(curve.color).frame(width: 8, height: 8)
+                SwiftUI.Circle().fill(curve.color).frame(width: 8, height: 8)
                 Text(L[curve.labelKey])
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(Theme.text)

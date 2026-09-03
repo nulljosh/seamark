@@ -171,6 +171,6 @@ enum L {
         "exponentialf": "指数",
     ]
     static let all = ["en": en, "es": es, "fr": fr, "de": de, "ja": ja, "zh": zh]
-    static var language = Locale.current.language.languageCode?.identifier ?? "en"
+    static nonisolated(unsafe) var language = Locale.current.language.languageCode?.identifier ?? "en"
     static subscript(_ key: String) -> String { (all[language] ?? en)[key] ?? en[key] ?? key }
 }
