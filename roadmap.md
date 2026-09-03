@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Open
+- [ ] Apple Watch companion app -- standalone watchOS target (XcodeGen), same pattern as talli/watchos, sparkjar/watchos, epiphany/watchos, and the new companions in bookrank/charwork/curvely/fengshui/inkpress/lexly/quotestreak. Deferred 2026-09-02 to keep the sweep scoped; pick network+token-pairing, App-Group share, or a fully local port depending on what the app actually is.
 - [ ] Publish to npm (name settled: seamark)
 - [ ] App Store records for iOS/macOS; Play Store for Android. Held until the 4.3(a) wave clears
 - [ ] Native-speaker pass on the es/fr/de/ja/zh strings
