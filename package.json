@@ -2,6 +2,7 @@
   "name": "seamark",
   "version": "0.1.0",
   "description": "Read the numbers out of graphics a page only shows as pictures",
+  "keywords": ["image-reading", "ocr", "graphics"],
   "type": "module",
   "main": "src/index.js",
   "scripts": {
