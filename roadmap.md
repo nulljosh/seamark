@@ -1,7 +1,6 @@
 # Roadmap
 
 ## Open
-- [ ] Publish to npm (name settled: seamark, confirmed free 2026-09-06). Blocked on `npm login`, then `npm publish --access public`
 - [ ] App Store records for iOS/macOS; Play Store for Android. Held until the 4.3(a) wave clears
 - [ ] Native-speaker pass on the es/fr/de/ja/zh strings
 

@@ -1,5 +1,5 @@
 {
-  "name": "seamark",
+  "name": "@nulljosh/seamark",
   "version": "0.1.0",
   "description": "Read the numbers out of graphics a page only shows as pictures",
   "keywords": [
@@ -19,6 +19,9 @@
     "README.md",
     "LICENSE"
   ],
-  "repository": "github:nulljosh/seamark",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nulljosh/seamark.git"
+  },
   "homepage": "https://seamark.heyitsmejosh.com"
 }
