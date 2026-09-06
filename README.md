@@ -2,7 +2,7 @@
 
 # Seamark
 
-![version](https://img.shields.io/badge/version-v0.1.0-blue) ![license](https://img.shields.io/badge/license-MIT-green) [![GitHub](https://img.shields.io/badge/GitHub-nulljosh%2Fseamark-black?logo=github)](https://github.com/nulljosh/seamark)
+![version](https://img.shields.io/badge/version-v0.1.0-blue) ![license](https://img.shields.io/badge/license-MIT-green) [![GitHub](https://img.shields.io/badge/GitHub-nulljosh%2Fseamark-black?logo=github)](https://github.com/nulljosh/seamark) [![npm](https://img.shields.io/npm/v/%40nulljosh%2Fseamark?logo=npm&color=cb3837)](https://www.npmjs.com/package/@nulljosh/seamark)
 
 
 The page shows a chart. You need the numbers. Seamark reads them off the drawing.
