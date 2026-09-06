@@ -2,12 +2,23 @@
   "name": "seamark",
   "version": "0.1.0",
   "description": "Read the numbers out of graphics a page only shows as pictures",
-  "keywords": ["image-reading", "ocr", "graphics"],
+  "keywords": [
+    "image-reading",
+    "ocr",
+    "graphics"
+  ],
   "type": "module",
   "main": "src/index.js",
   "scripts": {
     "test": "node --test test/*.test.mjs",
     "build": "cat src/coords.js src/curve.js src/expr.js src/dom.js > public/seamark.js"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": "github:nulljosh/seamark",
+  "homepage": "https://seamark.heyitsmejosh.com"
 }
