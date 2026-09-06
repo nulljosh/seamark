@@ -13,6 +13,12 @@ you the values behind it. For when the data never shows up as text: SVG charts,
 third-party embeds, visual checks, and browser agents that have to act on what
 they see.
 
+## Screenshots
+
+<p>
+<img src="screenshots/seamark-1.jpg" alt="Seamark">
+</p>
+
 ## What it does
 
 - **Keeps coordinates straight.** A browser graphic is measured in four rulers
