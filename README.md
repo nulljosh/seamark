@@ -75,3 +75,7 @@ MIT 2026 Joshua Trommel
 ## Whitepaper
 
 [Technical whitepaper](WHITEPAPER.md)
+
+## Architecture
+
+<img src="architecture.svg" width="600">
