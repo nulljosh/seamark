@@ -92,6 +92,7 @@ section h2 { font-size: clamp(1.75rem, 4.2vw, 2.5rem); font-weight: 700; letter-
 .feature { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 1.4rem; }
 .feature h3 { font-size: 1rem; font-weight: 650; margin-bottom: 0.4rem; }
 .feature p { font-size: 0.93rem; color: var(--text2); }
+.feature a { display: inline-block; margin-top: 0.6rem; font-size: 0.88rem; font-weight: 600; }
 
 /* demo */
 .bar { display: flex; gap: 0.5rem; margin: 0 0 1rem; flex-wrap: wrap; justify-content: center; }
@@ -170,6 +171,22 @@ function fit(){i.style.transform='scale('+(i.parentNode.clientWidth/i.offsetWidt
   </div>
 </section>
 
+<section id="solve">
+  <div class="container wide">
+    <h2 data-i18n="h_solve">Hand it a widget, not a picture.</h2>
+    <p class="xp-lead" data-i18n="solve_lead">Most of what's on a page isn't a drawing, it's state: dots that stack, that get dragged, that land back on a grid. This reads what's there now, works out the fewest moves to the target, and drives it with the same pointer events a hand would send.</p>
+    <div class="bar">
+      <button id="scramble" data-i18n="scramble">Scramble</button>
+      <button id="solveBtn" data-i18n="solveit">Solve it</button>
+    </div>
+    <div class="panel stage">
+      <svg id="dotplot" viewBox="0 0 600 205" aria-label="A dot plot: solid dots show what's there now, dashed circles show the target"></svg>
+    </div>
+    <p class="hint" data-i18n="legend">Solid dots are what's there. Dashed circles are the target.</p>
+    <p class="hint" id="solveStatus" aria-live="polite">&nbsp;</p>
+  </div>
+</section>
+
 <section class="features">
   <div class="container">
     <h2 data-i18n="h_reads">It reads the picture. You get the numbers.</h2>
@@ -189,6 +206,7 @@ function fit(){i.style.transform='scale('+(i.parentNode.clientWidth/i.offsetWidt
       <div class="feature">
         <h3 data-i18n="f4t">Widgets</h3>
         <p data-i18n="f4">Pick the iframe that is actually visible, pin labels to the edges and points they annotate, plan the drags a dot plot needs, and click in a way frameworks accept.</p>
+        <a href="#solve" data-i18n="tryit">Try it &rarr;</a>
       </div>
     </div>
   </div>
@@ -272,7 +290,7 @@ family(points);      // 'linear' | 'quadratic' | 'exponential' | null</code></pr
 </footer>
 
 <script type="module">
-import { samplePath, crossings, describe, fitCircle, family } from './seamark.js';
+import { samplePath, crossings, describe, fitCircle, family, rebalance } from './seamark.js';
 import { I18N, pick } from './i18n.js';
 const T = I18N[pick()];
 document.documentElement.lang = pick();
@@ -408,6 +426,93 @@ reset();
     col.innerHTML = items.join('') + items.join(''); // doubled so the loop is seamless
     host.appendChild(col);
   }
+})();
+
+// solve demo: a dot plot as real state, not a picture. rebalance() reads what's
+// there now against a target and returns the fewest drags that fix it.
+(function () {
+  const plot = document.getElementById('dotplot');
+  if (!plot) return;
+  const N = 5, MAXV = 10, X0 = 40, X1 = 560, AY = 100;
+  const xFor = (v) => X0 + (v / MAXV) * (X1 - X0);
+  const rand = () => Math.floor(Math.random() * (MAXV + 1));
+  const el = (n, a) => { const e = document.createElementNS(NS, n);
+    for (const k in a) e.setAttribute(k, a[k]); return e; };
+
+  const scrambleBtn = document.getElementById('scramble');
+  const solveBtn = document.getElementById('solveBtn');
+  const status = document.getElementById('solveStatus');
+
+  let target = [], items = [], solving = false;
+
+  function slotsFor(values) {
+    const seen = new Map();
+    return values.map((v) => { const c = seen.get(v) || 0; seen.set(v, c + 1); return c; });
+  }
+
+  function layout() {
+    const slots = slotsFor(items.map((it) => it.value));
+    items.forEach((it, i) => {
+      it.el.setAttribute('cx', xFor(it.value));
+      it.el.setAttribute('cy', AY - 20 - slots[i] * 20);
+    });
+  }
+
+  function axis() {
+    const g = el('g', {});
+    g.appendChild(el('line', { x1: X0, y1: AY, x2: X1, y2: AY, stroke: 'var(--text2)', 'stroke-width': 1.5 }));
+    for (let v = 0; v <= MAXV; v++) {
+      const x = xFor(v);
+      g.appendChild(el('line', { x1: x, y1: AY - 4, x2: x, y2: AY + 4, stroke: 'var(--text2)', 'stroke-width': 1 }));
+      const t = el('text', { x, y: AY + 16, 'text-anchor': 'middle', 'font-size': 12, fill: 'var(--text2)' });
+      t.textContent = v; g.appendChild(t);
+    }
+    return g;
+  }
+
+  function build() {
+    target = Array.from({ length: N }, rand);
+    const current = Array.from({ length: N }, rand);
+    plot.replaceChildren(axis());
+    const gslots = slotsFor(target);
+    target.forEach((v, i) => plot.appendChild(el('circle', {
+      cx: xFor(v), cy: AY + 24 + gslots[i] * 20, r: 9,
+      fill: 'none', stroke: 'var(--text2)', 'stroke-width': 1.5, 'stroke-dasharray': '3 3',
+    })));
+    items = current.map((v) => {
+      const c = el('circle', { r: 9, fill: 'var(--accent)' });
+      c.style.transition = 'cx .55s cubic-bezier(.4,0,.2,1), cy .55s cubic-bezier(.4,0,.2,1)';
+      plot.appendChild(c);
+      return { value: v, el: c };
+    });
+    layout();
+    status.textContent = ' ';
+    solveBtn.disabled = false;
+  }
+
+  function solve() {
+    if (solving) return;
+    const moves = rebalance(items, target, (it) => it.value);
+    if (!moves || !moves.length) { status.textContent = T.already; return; }
+    solving = true; solveBtn.disabled = true; scrambleBtn.disabled = true;
+    status.textContent = T.solving;
+    let i = 0;
+    (function step() {
+      if (i >= moves.length) {
+        solving = false; scrambleBtn.disabled = false;
+        status.textContent = T.solvedfmt.replace('{n}', moves.length);
+        return;
+      }
+      const mv = moves[i++];
+      mv.item.value = mv.to;
+      layout();
+      setTimeout(step, 600);
+    })();
+  }
+
+  scrambleBtn.onclick = build;
+  solveBtn.onclick = solve;
+  build();
 })();
 </script>
 </body>
