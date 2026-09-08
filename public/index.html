@@ -131,13 +131,15 @@ a.skip:focus { position: fixed; left: 1rem; top: 1rem; z-index: 99; padding: 0.5
 </script>
 <style>
 /* Live demo: the real app in a frame matching the visitor's device (nimble treatment) */
-.demo{margin:2rem auto 0;text-align:center;position:relative;z-index:2}
-.demo .device-screen{aspect-ratio:9/19.5}
-.demo .device-mac .device-screen,.demo .device-windows .device-screen{aspect-ratio:16/10}
-.demo .device-screen iframe{position:absolute;top:0;left:0;border:0;display:block;transform-origin:0 0;width:390px;height:845px;background:#fff}
-.demo .device-mac .device-screen iframe,.demo .device-windows .device-screen iframe{width:1024px;height:640px}
+.phone-demo{margin:2rem auto 0;text-align:center;position:relative;z-index:2}
+.phone-demo .device-screen{aspect-ratio:9/19.5}
+.phone-demo .device-mac .device-screen,.phone-demo .device-windows .device-screen{aspect-ratio:16/10}
+.phone-demo .device-screen iframe{position:absolute;top:0;left:0;border:0;display:block;transform-origin:0 0;width:390px;height:845px;background:#fff}
+.phone-demo .device-mac .device-screen iframe,.phone-demo .device-windows .device-screen iframe{width:1024px;height:640px}
 .demo-caption{font-size:.9rem;opacity:.65;margin:1rem 0 0}
-.embed .demo,.embed footer,.embed nav,.embed .hero{display:none!important}
+/* embed mode (inside the phone's iframe): show only the working demo, not the rest of the landing page */
+.embed main > section:not(#demo){display:none!important}
+.embed footer,.embed nav{display:none!important}
 </style>
 </head>
 <body>
@@ -150,7 +152,7 @@ a.skip:focus { position: fixed; left: 1rem; top: 1rem; z-index: 99; padding: 0.5
     <img class="mark" src="icon.svg" alt="" width="72" height="72">
     <h1>Seamark</h1>
     <p data-i18n="tag">A seamark is a fixed thing you can see from the water and steer by. This library does the same for a web page: it reads real values out of rendered graphics.</p>
-<div class="demo">
+<div class="phone-demo">
   <div class="device device-iphone" id="demoFrame" data-title="Seamark"><div class="device-screen"><iframe id="demoApp" title="Seamark, live" loading="lazy" data-src="./?embed"></iframe></div></div>
   <p class="demo-caption">This is the <span id="demoDev">iPhone</span> app, live. Try it.</p>
 </div>
