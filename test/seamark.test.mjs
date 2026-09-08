@@ -121,3 +121,21 @@ test('rebalance moves surplus dots into deficit columns', () => {
   assert.equal(m[0].to, 5);
   assert.equal(rebalance(dots, [3, 5, 5]), null);
 });
+
+test('grid cell lands in the middle of the square, both orientations', async () => {
+  const { gridCell } = await import('../src/coords.js');
+  const rect = { left: 0, top: 0, width: 800, height: 800 };
+  assert.deepEqual(gridCell('a1', rect), { x: 50, y: 750 });
+  assert.deepEqual(gridCell('a1', rect, { flipped: true }), { x: 750, y: 50 });
+  assert.deepEqual(gridCell([4, 3], rect), gridCell('e4', rect));
+});
+
+test('fiber walk returns the first matching props up the tree', async () => {
+  const { fiberFind } = await import('../src/dom.js');
+  const top = { memoizedProps: { fen: 'start' }, return: null };
+  const mid = { memoizedProps: {}, memoizedState: null, return: top };
+  const el = { __reactFiber$abc: { memoizedProps: { x: 1 }, return: mid } };
+  assert.equal(fiberFind(el, (p) => p.fen), 'start');
+  assert.equal(fiberFind(el, (p) => p.nope), null);
+  assert.equal(fiberFind(null, (p) => p.fen), null);
+});

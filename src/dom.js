@@ -140,3 +140,23 @@ export function tap(el, view = window) {
   el.dispatchEvent(new M('click', { ...base, buttons: 0 }));
   return true;
 }
+
+/**
+ * Walk up the React fiber tree from a DOM node and return the first props or
+ * state object the predicate accepts. The drawing on screen is often a
+ * projection of state the framework holds a few components up; when the
+ * pixels are ambiguous, the state is not.
+ */
+export function fiberFind(el, pick, depth = 12) {
+  if (!el) return null;
+  const key = Object.keys(el).find((k) => k.startsWith('__reactFiber$'));
+  let f = el[key], d = 0;
+  while (f && d++ < depth) {
+    for (const o of [f.memoizedProps, f.memoizedState]) {
+      const v = o && pick(o, f);
+      if (v !== undefined && v !== null && v !== false) return v;
+    }
+    f = f.return;
+  }
+  return null;
+}

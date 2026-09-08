@@ -50,6 +50,22 @@ export function snap(v, tol = 0.2) {
   const r = Math.round(v);
   return Math.abs(v - r) <= tol ? r : v;
 }
+
+/**
+ * Centre of one cell in a drawn grid, by chess-style name ("e4") or
+ * [col, row]. A board drawn on a canvas has no DOM cells to click, so the
+ * only way to hit a square is arithmetic on its bounding box. `flipped`
+ * means the grid is drawn from the other side, as a board is for black.
+ */
+export function gridCell(cell, rect, { size = 8, flipped = false } = {}) {
+  const [col0, row0] = typeof cell === 'string'
+    ? [cell.charCodeAt(0) - 97, +cell.slice(1) - 1]
+    : cell;
+  const col = flipped ? size - 1 - col0 : col0;
+  const row = flipped ? row0 : size - 1 - row0;
+  const w = rect.width / size, h = rect.height / size;
+  return { x: rect.left + w * (col + 0.5), y: rect.top + h * (row + 0.5) };
+}
 // Reading values off a drawn curve. The page rarely states what it plots, so
 // the drawing itself is the data source.
 
@@ -411,4 +427,24 @@ export function tap(el, view = window) {
   el.dispatchEvent(new M('mouseup', { ...base, buttons: 0 }));
   el.dispatchEvent(new M('click', { ...base, buttons: 0 }));
   return true;
+}
+
+/**
+ * Walk up the React fiber tree from a DOM node and return the first props or
+ * state object the predicate accepts. The drawing on screen is often a
+ * projection of state the framework holds a few components up; when the
+ * pixels are ambiguous, the state is not.
+ */
+export function fiberFind(el, pick, depth = 12) {
+  if (!el) return null;
+  const key = Object.keys(el).find((k) => k.startsWith('__reactFiber$'));
+  let f = el[key], d = 0;
+  while (f && d++ < depth) {
+    for (const o of [f.memoizedProps, f.memoizedState]) {
+      const v = o && pick(o, f);
+      if (v !== undefined && v !== null && v !== false) return v;
+    }
+    f = f.return;
+  }
+  return null;
 }

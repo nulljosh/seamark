@@ -2,7 +2,7 @@
 
 # Seamark
 
-![version](https://img.shields.io/badge/version-v0.1.0-blue) ![license](https://img.shields.io/badge/license-MIT-green) [![GitHub](https://img.shields.io/badge/GitHub-nulljosh%2Fseamark-black?logo=github)](https://github.com/nulljosh/seamark) [![npm](https://img.shields.io/npm/v/%40nulljosh%2Fseamark?logo=npm&color=cb3837)](https://www.npmjs.com/package/@nulljosh/seamark)
+![version](https://img.shields.io/badge/version-v0.2.0-blue) ![license](https://img.shields.io/badge/license-MIT-green) [![GitHub](https://img.shields.io/badge/GitHub-nulljosh%2Fseamark-black?logo=github)](https://github.com/nulljosh/seamark) [![npm](https://img.shields.io/npm/v/%40nulljosh%2Fseamark?logo=npm&color=cb3837)](https://www.npmjs.com/package/@nulljosh/seamark)
 
 
 The page shows a chart. You need the numbers. Seamark reads them off the drawing.
@@ -43,10 +43,13 @@ const points = samplePath(document.querySelector('svg path'), space.toData);
 crossings(points);   // where the curve meets y = 0
 fitCircle(points);   // { cx, cy, r }
 family(points);      // 'linear' | 'quadratic' | 'exponential' | null
+
+gridCell('e4', board.getBoundingClientRect(), { flipped: playingBlack }); // where to click on a canvas board
+fiberFind(canvas, (props) => props.fen); // the state behind the drawing, when React holds it
 ```
 
 ```sh
-npm test         # 16 tests
+npm test         # 18 tests
 npm run build    # bundles src/ into public/seamark.js for the demo
 ```
 
