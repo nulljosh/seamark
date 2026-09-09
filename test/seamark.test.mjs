@@ -139,3 +139,19 @@ test('fiber walk returns the first matching props up the tree', async () => {
   assert.equal(fiberFind(el, (p) => p.nope), null);
   assert.equal(fiberFind(null, (p) => p.fen), null);
 });
+
+test('tileText strips the shortcut number and normalises', async () => {
+  const { tileText } = await import('../src/dom.js');
+  assert.equal(tileText({ innerText: '1\nești' }), 'ești');
+  assert.equal(tileText({ innerText: '  How   much ' }), 'how much');
+  assert.equal(tileText(null), '');
+});
+
+test('waitFor resolves when the element appears, null on timeout', async () => {
+  const { waitFor } = await import('../src/dom.js');
+  let hit = null;
+  const root = { querySelector: () => hit };
+  setTimeout(() => { hit = { ok: true }; }, 30);
+  assert.deepEqual(await waitFor('x', 500, root, 10), { ok: true });
+  assert.equal(await waitFor('x', 20, { querySelector: () => null }, 5), null);
+});

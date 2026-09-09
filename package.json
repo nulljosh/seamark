@@ -1,6 +1,6 @@
 {
   "name": "@nulljosh/seamark",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Read the numbers out of graphics a page only shows as pictures",
   "keywords": [
     "image-reading",

@@ -448,3 +448,60 @@ export function fiberFind(el, pick, depth = 12) {
   }
   return null;
 }
+
+/**
+ * Wait for a selector to appear. Trees render late after a failed route, and
+ * "the element is not there" usually means "not yet".
+ */
+export function waitFor(selector, ms = 20000, root = document, step = 250) {
+  return new Promise((resolve) => {
+    const t0 = Date.now();
+    const tick = () => {
+      const el = root.querySelector(selector);
+      if (el) return resolve(el);
+      if (Date.now() - t0 >= ms) return resolve(null);
+      setTimeout(tick, step);
+    };
+    tick();
+  });
+}
+
+/**
+ * Type into whatever the page uses for text: input, textarea, or a
+ * contenteditable span. Frameworks watch the native value setter and the
+ * input event, not the .value property; contenteditables want insertText.
+ */
+export function typeInto(el, text, doc = document) {
+  if (!el) return false;
+  if (el.isContentEditable) {
+    el.focus();
+    doc.execCommand('selectAll', false, null);
+    doc.execCommand('insertText', false, text);
+    return true;
+  }
+  const proto = el.tagName === 'TEXTAREA' ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
+  const set = Object.getOwnPropertyDescriptor(proto, 'value');
+  if (set && set.set) set.set.call(el, text); else el.value = text;
+  el.dispatchEvent(new Event('input', { bubbles: true }));
+  return true;
+}
+
+/**
+ * The text a tile shows, minus its keyboard-shortcut number. Compare tiles
+ * with ===; a contains() match once turned "e" into "ești".
+ */
+export function tileText(el, inner = '[data-test="challenge-tap-token-text"]') {
+  const s = (el && el.querySelector && el.querySelector(inner)) || el;
+  return ((s && (s.innerText || s.textContent)) || '').replace(/\s+/g, ' ').trim().replace(/^\d+\s+/, '').toLowerCase();
+}
+
+/**
+ * Live tiles in the bank. Placed tiles are copies that sit outside the bank
+ * and match the same selector, so scope to the bank when one exists;
+ * multi-word tiles carry the marker mid-attribute, so match with *=.
+ */
+export function tokens(root = document, bank = '[data-test="word-bank"]', mark = 'challenge-tap-token') {
+  const scope = root.querySelector(bank) || root;
+  return [...scope.querySelectorAll(`[data-test*="${mark}"]:not([data-test="${mark}-text"])`)]
+    .filter((b) => b.getAttribute('aria-disabled') !== 'true' && !b.disabled);
+}
