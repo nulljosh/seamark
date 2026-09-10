@@ -160,7 +160,13 @@ function solve(A, b) {
   return M.map((row, i) => row[n] / row[i]);
 }
 
-/** Least-squares coefficients for y = sum(c_i * basis_i(x)). */
+/**
+ * Least-squares coefficients for y = sum(c_i * basis_i(x)).
+ * Builds and solves the normal equations (A^T A c = A^T y) directly rather than
+ * doing a full matrix decomposition, since `basis` here is always small (2-4
+ * terms for linear/quadratic/exponential fits), so A is tiny and this is exact
+ * enough without pulling in a linear-algebra dependency.
+ */
 function fitBasis(xs, ys, basis) {
   const k = basis.length;
   const A = Array.from({ length: k }, () => new Array(k).fill(0));
