@@ -1,6 +1,6 @@
 # Seamark Technical Whitepaper
 
-**v0.1.0** | September 2026
+**v0.3.0** | September 2026
 
 Seamark reads the numbers out of a chart or diagram that a web page only
 shows as a picture. It looks at what a page draws, not what it stores. Useful
@@ -23,7 +23,7 @@ ever converted implicitly.
 | `coords.js` | data space, page and frame offsets, screenshot scale |
 | `curve.js` | `samplePath`, `crossings`, `fitCircle`, `family` |
 | `expr.js` | compare formulas numerically at several points |
-| `dom.js` | pick the visible iframe, pin labels to shapes, plan drags, click so frameworks accept it |
+| `dom.js` | pick the visible iframe, pin labels to shapes, plan drags, click so frameworks accept it, walk a React fiber tree, wait for an element, type into a field, match tile text, read a word bank |
 
 `samplePath` walks an SVG path with `getPointAtLength` and maps through the
 data space. `crossings` finds sign changes against a level. `fitCircle` is a
@@ -39,7 +39,8 @@ point anyone tests, so equality is checked at several.
 Each app carries its own engine port with tests beside it, so nothing depends
 on a web view.
 
-- **Web**: `src/` bundled to `public/seamark.js`. `npm test` runs 16 tests.
+- **Web**: `src/` bundled to `public/seamark.js`. `npm test` runs 20 tests.
+  Also published as [`@nulljosh/seamark`](https://www.npmjs.com/package/@nulljosh/seamark) on npm.
 - **iPhone, iPad, Mac**: SwiftUI in `ios/`, `Engine.swift`.
 - **Android, Windows, Linux**: Compose Multiplatform in `kmp/`, `Engine.kt`.
   Desktop packages as MSI, DEB or DMG. Android needs JDK 17.
