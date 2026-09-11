@@ -2,7 +2,7 @@
 // ponytail: one object, picked by navigator.language; no framework, no fetch.
 export const I18N = {
 en: {
-  tag: "A seamark is a fixed thing you can see from the water and steer by. This library does the same for a web page: it reads real values out of rendered graphics.",
+  tag: "A fixed point you can steer a web page by.",
   try: "Try the demo", source: "Source on GitHub",
   h_reads: "It reads the picture. You get the numbers.",
   f1t: "Coordinates", f1: "SVG units, page pixels, an iframe's viewport and screenshot space, with every conversion explicit. Mixing two gives plausible numbers, never an error.",
