@@ -155,3 +155,47 @@ test('waitFor resolves when the element appears, null on timeout', async () => {
   assert.deepEqual(await waitFor('x', 500, root, 10), { ok: true });
   assert.equal(await waitFor('x', 20, { querySelector: () => null }, 5), null);
 });
+
+test('clusterGrid recovers a table from positioned cells', async () => {
+  const { clusterGrid } = await import('../src/coords.js');
+  // three rows of two, absolutely placed — no <table>, only coordinates
+  const cells = [
+    { x: 100, y: 50, t: '60 / 15' }, { x: 300, y: 52, t: '4' },
+    { x: 101, y: 90, t: '75 / 15' }, { x: 299, y: 91, t: '5' },
+    { x: 100, y: 130, t: '90 / 15' }, { x: 300, y: 129, t: '?' },
+  ];
+  const { grid, xs, ys } = clusterGrid(cells);
+  assert.deepEqual(grid, [['60 / 15', '4'], ['75 / 15', '5'], ['90 / 15', '?']]);
+  assert.equal(xs.length, 2);
+  assert.equal(ys.length, 3);
+});
+
+test('clusterGrid: per-axis tolerance keeps near rows apart from wide columns', async () => {
+  const { clusterGrid } = await import('../src/coords.js');
+  // rows 20px apart would merge under a single 24px tolerance
+  const cells = [
+    { x: 0, y: 0, t: 'a' }, { x: 200, y: 0, t: 'b' },
+    { x: 0, y: 20, t: 'c' }, { x: 200, y: 20, t: 'd' },
+    { x: 0, y: 40, t: 'e' }, { x: 200, y: 40, t: 'f' },
+  ];
+  assert.deepEqual(clusterGrid(cells, { tolY: 10 }).grid, [['a', 'b'], ['c', 'd'], ['e', 'f']]);
+});
+
+test('clusterGrid returns null rather than a one-cell "table"', async () => {
+  const { clusterGrid } = await import('../src/coords.js');
+  assert.equal(clusterGrid([{ x: 1, y: 1, t: 'x' }]), null);
+  assert.equal(clusterGrid([]), null);
+  assert.equal(clusterGrid(null), null);
+});
+
+test('gridCell insets a grid drawn inside its own padding', async () => {
+  const { gridCell, insetRect } = await import('../src/coords.js');
+  const rect = { left: 0, top: 0, width: 1000, height: 1000 };
+  // a board drawn at 80% of a canvas, offset from the corner
+  const inset = { left: 0.0975, top: 0.1, width: 0.8 };
+  const a1 = gridCell('a1', rect, { inset });
+  assert.deepEqual(insetRect(rect, inset), { left: 97.5, top: 100, width: 800, height: 800 });
+  assert.deepEqual(a1, { x: 97.5 + 50, y: 100 + 750 });
+  // without the inset every square lands wrong, which is the whole hazard
+  assert.notDeepEqual(gridCell('a1', rect), a1);
+});
