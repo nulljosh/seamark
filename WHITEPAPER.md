@@ -2,8 +2,11 @@
 
 **v0.3.0** | September 2026
 
-Seamark reads the numbers out of a chart or diagram that a web page only
-shows as a picture. It looks at what a page draws, not what it stores. Useful
+A chart on a web page usually has no API behind it: the numbers only exist as
+pixels in an SVG or a screenshot, invisible to anything that isn't a human
+eye. Seamark reads the numbers out of a chart or diagram that a web page only
+shows as a picture. It looks at what a page draws, not what it stores, because
+for a third-party embed that's the only thing available. Useful
 for SVG charts, third-party embeds, visual checks, and browser agents that
 must act on what a page shows. Library plus demo apps on every platform. Live
 at [seamark.heyitsmejosh.com](https://seamark.heyitsmejosh.com).
@@ -12,9 +15,10 @@ at [seamark.heyitsmejosh.com](https://seamark.heyitsmejosh.com).
 
 A browser graphic is measured in four rulers at once: SVG user units, page
 pixels, the iframe it sits in, and your screenshot. Mixing two gives a
-plausible wrong number. `src/coords.js` makes every conversion explicit:
+plausible wrong number, which is worse than an obviously wrong one because
+nothing flags it. `src/coords.js` makes every conversion explicit:
 `makeDataSpace(originPx, unitPx)` returns `toData` and `toPx` and nothing is
-ever converted implicitly.
+ever converted implicitly, so a coordinate always carries the ruler it came from.
 
 ## Modules
 
@@ -37,7 +41,8 @@ point anyone tests, so equality is checked at several.
 ## Ports
 
 Each app carries its own engine port with tests beside it, so nothing depends
-on a web view.
+on a web view, and a native app doesn't have to embed a browser just to reuse
+this logic.
 
 - **Web**: `src/` bundled to `public/seamark.js`. `npm test` runs 20 tests.
   Also published as [`@nulljosh/seamark`](https://www.npmjs.com/package/@nulljosh/seamark) on npm.
