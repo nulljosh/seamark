@@ -1,14 +1,16 @@
 # Architecture
 
-Seamark reads values off rendered charts, SVG paths, and grids. A chart lives in four coordinate spaces at once: SVG user units, CSS pixels on the page, pixels within an iframe, and screenshot pixels if the image is scaled. Every conversion is explicit to avoid plausible-looking wrong numbers. The library also samples curves, fits circles, detects curve families (linear, quadratic, exponential), and fingerprints expressions to compare them even when written in different forms.
+Seamark reads numbers off a picture of a chart. Point it at a graph on a web page and it tells you where the line crosses zero, what shape the curve is, and what the values are at any point. It is the difference between eyeballing a graph and getting real figures out of it.
 
-Seamark is an npm library plus a web demo at seamark.heyitsmejosh.com, plus native apps for iOS, macOS, watchOS, and KMP (Android/Windows/Linux).
+The tricky part is that the same point on a chart has several different addresses at once: where it sits inside the drawing, where it sits on the screen, and where it sits in a screenshot. Seamark converts between all of them on purpose, step by step, so it never hands back a number that looks right but is not.
+
+Seamark ships as a code library other apps can use, a web demo at seamark.heyitsmejosh.com, and native apps for iOS, macOS, watchOS, and Android/Windows/Linux.
 
 ## How it runs
 
-**Web:** User navigates to seamark.heyitsmejosh.com. Vite app loads. User draws a curve or enters two reference points. The browser calls the seamark library: `samplePath()` to read the curve's points, `makeDataSpace()` to map page pixels to chart units, `crossings()` to find where the curve meets y=0, `fitCircle()` to fit a partial arc, `family()` to classify the curve's shape. Results display below the drawing.
+**Web:** You open seamark.heyitsmejosh.com and draw a curve, or type in two points you already know the values of. Those two points tell Seamark the scale of the chart. It then walks the curve, finds where it crosses the zero line, fits a circle to any arc, and names the shape of the curve: straight, a parabola, or exponential growth. Results appear below the drawing. The functions doing this work are `samplePath()`, `makeDataSpace()`, `crossings()`, `fitCircle()`, and `family()`.
 
-**Native apps:** iOS, macOS, and watchOS use the same drawing and analysis UI via SwiftUI. `Engine.swift` is the Swift port of the seamark library. watchOS pages through six preset curves instead of freehand drawing. KMP apps (Android/Windows/Linux) use `Engine.kt`, the Kotlin port.
+**Native apps:** iOS, macOS, and watchOS give you the same drawing and analysis screen, built in SwiftUI. `Engine.swift` is the same maths rewritten in Swift. On a watch there is no room to draw, so it flips through six ready-made curves instead. The Android, Windows, and Linux apps share `Engine.kt`, the Kotlin version of the same code.
 
 ## Core library
 
