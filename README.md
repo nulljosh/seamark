@@ -13,6 +13,8 @@ you the values behind it. For when the data never shows up as text: SVG charts,
 third-party embeds, visual checks, and browser agents that have to act on what
 they see.
 
+<img src="progress.svg" width="460">
+
 ## Screenshots
 
 <p>
