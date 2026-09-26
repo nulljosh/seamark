@@ -15,22 +15,22 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>
 @import url("https://heyitsmejosh.com/tokens.css");
+:root{--accent-soft:color-mix(in srgb,var(--accent) 9%,var(--bg));}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--link:var(--clay);}}
+:root[data-theme="dark"]{--link:var(--clay);}
 
 :root {
-  --accent: #c2451f;
-  --link: #a33a19;
-  --accent-soft: #fbeee8;
+  --accent: var(--clay);
+  --link: var(--clay-deep);
   --font-body: -apple-system, system-ui, "Inter", "Segoe UI", sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --link: #e8703f;
-    --accent-soft: #1f1613;
+    --link: var(--clay);
   }
 }
 :root[data-theme="dark"] {
-  --link: #e8703f;
-  --accent-soft: #1f1613;
+  --link: var(--clay);
 }
 
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
