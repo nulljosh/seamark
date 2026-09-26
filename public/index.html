@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Seamark — read real values out of rendered graphics</title>
 <meta name="description" content="A small JavaScript library that recovers the numbers behind charts, diagrams and widgets that only exist as drawn output.">
-<meta name="theme-color" content="#c2451f">
+<meta name="theme-color" content="#f5f0e4">
 <meta property="og:title" content="Seamark — read real values out of rendered graphics">
 <meta property="og:description" content="A small JavaScript library that recovers the numbers behind charts, diagrams and widgets that only exist as drawn output.">
 <meta property="og:type" content="website">
@@ -20,24 +20,17 @@
   --accent: #c2451f;
   --link: #a33a19;
   --accent-soft: #fbeee8;
-  --bg: #ffffff;
-  --bg2: #f7f7f8;
-  --text: #1c1d22;
-  --text2: #5c5f6a;
-  --border: #e6e7ea;
   --font-body: -apple-system, system-ui, "Inter", "Segoe UI", sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #121316; --bg2: #1a1b1f; --link: #e8703f;
-    --text: #ececf0; --text2: rgba(236,236,240,0.62);
-    --border: rgba(236,236,240,0.12); --accent-soft: #1f1613;
+    --link: #e8703f;
+    --accent-soft: #1f1613;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #121316; --bg2: #1a1b1f; --link: #e8703f;
-  --text: #ececf0; --text2: rgba(236,236,240,0.62);
-  --border: rgba(236,236,240,0.12); --accent-soft: #1f1613;
+  --link: #e8703f;
+  --accent-soft: #1f1613;
 }
 
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
