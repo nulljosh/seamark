@@ -96,7 +96,11 @@ export function clusterGrid(cells, { tolX = 24, tolY = 14, min = 6 } = {}) {
   const xs = cluster(pts.map((c) => c.x), tolX);
   const near = (v, arr) => arr.reduce((b, a, i) => (Math.abs(a - v) < Math.abs(arr[b] - v) ? i : b), 0);
   const grid = ys.map(() => xs.map(() => ''));
-  for (const c of pts) grid[near(c.y, ys)][near(c.x, xs)] = c.t ?? '';
+  // Left to right, so a cell drawn as several spans ('12' + '%') reads in order.
+  for (const c of [...pts].sort((a, b) => a.x - b.x)) {
+    const r = near(c.y, ys), k = near(c.x, xs), t = c.t ?? '';
+    grid[r][k] = grid[r][k] && t ? `${grid[r][k]} ${t}` : grid[r][k] || t;
+  }
   return { grid, xs, ys };
 }
 

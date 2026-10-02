@@ -199,3 +199,10 @@ test('gridCell insets a grid drawn inside its own padding', async () => {
   // without the inset every square lands wrong, which is the whole hazard
   assert.notDeepEqual(gridCell('a1', rect), a1);
 });
+
+test('clusterGrid joins spans that share a cell instead of keeping the last', async () => {
+  const { clusterGrid } = await import('../src/coords.js');
+  const cells = [[0, 0, 'a'], [100, 0, 'b'], [0, 40, 'c'], [100, 40, '12'], [110, 40, '%'], [0, 80, 'e'], [100, 80, 'f']]
+    .map(([x, y, t]) => ({ x, y, t }));
+  assert.deepEqual(clusterGrid(cells).grid, [['a', 'b'], ['c', '12 %'], ['e', 'f']]);
+});

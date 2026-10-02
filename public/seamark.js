@@ -57,14 +57,66 @@ export function snap(v, tol = 0.2) {
  * only way to hit a square is arithmetic on its bounding box. `flipped`
  * means the grid is drawn from the other side, as a board is for black.
  */
-export function gridCell(cell, rect, { size = 8, flipped = false } = {}) {
+export function gridCell(cell, rect, { size = 8, flipped = false, inset } = {}) {
   const [col0, row0] = typeof cell === 'string'
     ? [cell.charCodeAt(0) - 97, +cell.slice(1) - 1]
     : cell;
   const col = flipped ? size - 1 - col0 : col0;
   const row = flipped ? row0 : size - 1 - row0;
-  const w = rect.width / size, h = rect.height / size;
-  return { x: rect.left + w * (col + 0.5), y: rect.top + h * (row + 0.5) };
+  const g = inset ? insetRect(rect, inset) : rect;
+  const w = g.width / size, h = g.height / size;
+  return { x: g.left + w * (col + 0.5), y: g.top + h * (row + 0.5) };
+}
+
+/**
+ * Recover a table from cells that were merely POSITIONED like one. A layout
+ * built from absolutely-placed spans has no rows or columns to read, only
+ * coordinates — so cluster the centres on each axis and let membership fall
+ * out of which cluster a cell is nearest.
+ *
+ * Tolerances are per-axis on purpose: text lines sit much closer vertically
+ * than columns do horizontally, and a single tolerance either merges two rows
+ * or splits one column in half.
+ *
+ * `cells` are `{ x, y, t }` centres in any one space. Returns the grid plus
+ * the cluster centres, so a caller can map a cell back to a click target.
+ */
+export function clusterGrid(cells, { tolX = 24, tolY = 14, min = 6 } = {}) {
+  const pts = (cells || []).filter((c) => c && Number.isFinite(c.x) && Number.isFinite(c.y));
+  if (pts.length < min) return null;
+  const cluster = (vals, tol) => {
+    const out = [];
+    [...vals].sort((a, b) => a - b).forEach((v) => {
+      const g = out.find((g) => Math.abs(g[0] - v) < tol);
+      if (g) g.push(v); else out.push([v]);
+    });
+    return out.map((g) => g.reduce((a, b) => a + b, 0) / g.length);
+  };
+  const ys = cluster(pts.map((c) => c.y), tolY);
+  const xs = cluster(pts.map((c) => c.x), tolX);
+  const near = (v, arr) => arr.reduce((b, a, i) => (Math.abs(a - v) < Math.abs(arr[b] - v) ? i : b), 0);
+  const grid = ys.map(() => xs.map(() => ''));
+  // Left to right, so a cell drawn as several spans ('12' + '%') reads in order.
+  for (const c of [...pts].sort((a, b) => a.x - b.x)) {
+    const r = near(c.y, ys), k = near(c.x, xs), t = c.t ?? '';
+    grid[r][k] = grid[r][k] && t ? `${grid[r][k]} ${t}` : grid[r][k] || t;
+  }
+  return { grid, xs, ys };
+}
+
+/**
+ * The drawn grid is rarely the whole element. A board rendered on a canvas
+ * usually sits inside its own padding, so treating the element's box as the
+ * grid puts every click a fraction of a square off — close enough to look
+ * right and still select the wrong square. Fractions are of the element box.
+ */
+export function insetRect(rect, { left = 0, top = 0, width = 1, height = width } = {}) {
+  return {
+    left: rect.left + rect.width * left,
+    top: rect.top + rect.height * top,
+    width: rect.width * width,
+    height: rect.height * height,
+  };
 }
 // Reading values off a drawn curve. The page rarely states what it plots, so
 // the drawing itself is the data source.
@@ -160,13 +212,7 @@ function solve(A, b) {
   return M.map((row, i) => row[n] / row[i]);
 }
 
-/**
- * Least-squares coefficients for y = sum(c_i * basis_i(x)).
- * Builds and solves the normal equations (A^T A c = A^T y) directly rather than
- * doing a full matrix decomposition, since `basis` here is always small (2-4
- * terms for linear/quadratic/exponential fits), so A is tiny and this is exact
- * enough without pulling in a linear-algebra dependency.
- */
+/** Least-squares coefficients for y = sum(c_i * basis_i(x)). */
 function fitBasis(xs, ys, basis) {
   const k = basis.length;
   const A = Array.from({ length: k }, () => new Array(k).fill(0));
